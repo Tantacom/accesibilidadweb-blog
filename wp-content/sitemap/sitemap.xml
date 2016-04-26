@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generator="wordpress/2.2.3" -->
+<!-- sitemap-generator-url="http://www.arnebrachhold.de" sitemap-generator-version="2.7.1"  -->
+<!-- Debug: Total comment count: 171 -->
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/</loc>
+		<lastmod>2008-07-29T18:05:55+00:00</lastmod>
+		<changefreq>daily</changefreq>
+		<priority>1</priority>
+	</url>
+<!-- Debug: Start Postings -->
+<!-- Debug: Priority report of postID 76: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/herramientas/tabla-comparativa-entre-las-pautas-de-accesibilidad-y-las-practicas-para-moviles</loc>
+		<lastmod>2008-07-29T20:05:55+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 75: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/accesibilidad-en-los-portales-de-empleo</loc>
+		<lastmod>2008-07-28T08:49:59+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 74: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/primer-certficado-de-aenor-a-un-sitio-web-publico</loc>
+		<lastmod>2008-07-18T08:41:52+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 73: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/un-evento-y-una-herramienta</loc>
+		<lastmod>2008-07-01T22:53:24+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 64: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/internautas-sordos-denuncian-la-escasa-accesibilidad-de-muchos-sitios-web</loc>
+		<lastmod>2008-05-22T09:02:12+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 69: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/poca-accesibilidad-en-las-webs-de-los-hospitales-espanoles</loc>
+		<lastmod>2008-05-22T09:01:41+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 71: Comments: 80 of 171 = 0.5 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/accesibilidad-web-para-usuarios-de-edad-avanzada-primer-borrador-de-trabajo</loc>
+		<lastmod>2008-05-22T09:01:02+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+<!-- Debug: Priority report of postID 72: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/mantenimiento-de-la-accesibilidad-web</loc>
+		<lastmod>2008-05-20T22:32:07+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 70: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/accesibilidad-de-las-webs-de-las-comunidades-autonomas</loc>
+		<lastmod>2008-05-14T18:58:15+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 68: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/madrid-2016-estrenara-nueva-web-el-proximo-lunes</loc>
+		<lastmod>2008-04-17T08:58:52+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 67: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/disponibles-las-ponencias-de-la-jornada-informativa-de-aenor</loc>
+		<lastmod>2008-04-02T10:13:07+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 66: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/la-web-de-telefonica-premiada-por-su-accesibilidad</loc>
+		<lastmod>2008-03-26T09:51:55+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 65: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/jornadas-formativas-sobre-accesibilidad-web</loc>
+		<lastmod>2008-03-07T11:27:48+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 63: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/el-ayuntamiento-de-bilbao-certificado-por-aenor</loc>
+		<lastmod>2008-02-27T10:36:10+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 62: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/seminario-sobre-accesibilidad-web</loc>
+		<lastmod>2008-02-24T21:43:39+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 60: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/el-boletin-oficial-del-estado-boe-en-internet-sera-accesible</loc>
+		<lastmod>2008-02-12T10:47:38+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 59: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/diapositivas-del-seminario-de-legislacion</loc>
+		<lastmod>2008-02-03T20:24:49+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 58: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/herramientas/creacion-de-pdfs-accesibles-desde-word-2007</loc>
+		<lastmod>2008-01-29T22:54:41+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 57: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/diferencias-de-prioridad-entre-la-une-1398032004-y-la-wcag-10</loc>
+		<lastmod>2008-01-28T09:29:59+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 56: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/palabras-inusuales</loc>
+		<lastmod>2008-01-25T09:51:11+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 55: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/la-web-de-bankinter-la-mas-accesible-del-sector-privado</loc>
+		<lastmod>2008-01-17T09:49:53+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 54: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/recopilacion-sobre-legislacion-espanola</loc>
+		<lastmod>2008-01-14T22:54:32+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 53: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/una-definicion-de-accesibilidad-web</loc>
+		<lastmod>2008-01-14T22:50:48+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 52: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/%c2%bfla-version-de-evaluacion-de-jaws-no-esta-permitida-para-pruebas</loc>
+		<lastmod>2008-01-13T20:21:57+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 51: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/seminario-sobre-legislacion-de-accesibilidad-web</loc>
+		<lastmod>2008-01-10T23:19:06+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 50: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/el-ayuntamiento-de-pamplona-premiado-por-la-fundacion-once</loc>
+		<lastmod>2008-01-10T10:11:27+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 49: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/publicada-la-ley-de-medidas-de-impulso-de-la-sociedad-de-la-informacion</loc>
+		<lastmod>2007-12-30T20:46:34+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 48: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/legislacion/aprobada-en-el-senado-la-ley-de-medidas-de-impulso-de-la-sociedad-de-la-informacion</loc>
+		<lastmod>2007-12-13T10:08:55+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 46: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/reglas-de-etiqueta-frente-a-una-persona-con-discapacidad</loc>
+		<lastmod>2007-12-10T21:38:00+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 45: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/ganadores-de-la-tercera-edicion-de-los-premios-taw-a-la-accesibilidad-web</loc>
+		<lastmod>2007-11-30T14:21:39+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 44: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/disonancia-cognitiva</loc>
+		<lastmod>2007-11-28T23:12:20+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 43: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/epilepsia-fotosensitiva</loc>
+		<lastmod>2007-11-27T22:06:09+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 42: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/publicado-el-reglamento-para-el-acceso-de-las-personas-con-discapacidad-a-la-sociedad-de-la-informacion</loc>
+		<lastmod>2007-11-22T23:49:06+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 41: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/ley-de-lengua-de-signos</loc>
+		<lastmod>2007-11-20T23:44:38+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 40: Comments: 9 of 171 = 0.1 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/el-nuevo-decreto-ley-y-la-une-1398032004</loc>
+		<lastmod>2007-11-19T23:11:57+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 39: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/validador-del-w3c-para-webs-accesibles-desde-moviles</loc>
+		<lastmod>2007-11-14T14:00:56+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 38: Comments: 2 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/aprobado-el-reglamento-para-el-acceso-de-las-personas-con-discapacidad-a-la-sociedad-de-la-informacion</loc>
+		<lastmod>2007-11-12T23:20:46+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 37: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/ayuntamiento-de-aviles-nuevo-certificado-de-aenor</loc>
+		<lastmod>2007-11-12T09:45:53+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 36: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/publicado-informe-sobre-el-acceso-de-los-usuarios-con-discapacidad-a-las-telecomunicaciones</loc>
+		<lastmod>2007-11-07T23:39:50+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 35: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/reunion-del-w3c-world-wide-web-consortium</loc>
+		<lastmod>2007-11-07T23:26:05+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 33: Comments: 59 of 171 = 0.3 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/tecnicas-para-el-desarrollo-de-flash-accesible</loc>
+		<lastmod>2007-11-06T10:02:20+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.3</priority>
+	</url>
+<!-- Debug: Priority report of postID 34: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/tecnicas-para-el-desarrollo-de-documentos-pdfs-accesibles</loc>
+		<lastmod>2007-11-06T10:01:10+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 32: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/dossier-sobre-accesibilidad-electronica</loc>
+		<lastmod>2007-11-05T22:12:30+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 31: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/adaptacion-de-contenido-web-a-la-lengua-de-signos</loc>
+		<lastmod>2007-10-31T09:52:36+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 30: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/mejoras-de-accesibilidad-en-el-mac-os-x-105</loc>
+		<lastmod>2007-10-29T22:26:27+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 29: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/mejora-progresiva</loc>
+		<lastmod>2007-10-22T23:06:22+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 28: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/sentencia-de-un-tribunal-de-eeuu-contra-un-sitio-web</loc>
+		<lastmod>2007-10-11T08:53:26+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 27: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/telefonia-movil-e-internet-lo-mas-utilizado-por-los-sordos</loc>
+		<lastmod>2007-10-05T08:34:40+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 26: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/buenas-intenciones-mal-implementadas</loc>
+		<lastmod>2007-09-30T11:12:00+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 25: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/libros/libro-de-michele-diodati-accessibilita-guida-completa</loc>
+		<lastmod>2007-09-28T08:56:15+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 24: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/ensenar-al-usuario-a-aumentar-el-texto</loc>
+		<lastmod>2007-09-24T09:43:58+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 23: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/enlaces-click-aqui</loc>
+		<lastmod>2007-09-20T09:02:25+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 22: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/premios-de-la-universidad-complutense</loc>
+		<lastmod>2007-09-20T08:50:45+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 21: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/estadisticas-sobre-el-uso-del-atributo-longdesc</loc>
+		<lastmod>2007-09-18T08:56:30+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 20: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/traductor-a-lengua-de-signos-inglesa</loc>
+		<lastmod>2007-09-17T20:45:21+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 19: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/premios-taw-2007</loc>
+		<lastmod>2007-09-17T08:34:00+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 18: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/certificacion/accesibilidad-en-banners-de-paginas</loc>
+		<lastmod>2007-09-13T22:37:27+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 17: Comments: 2 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/herramientas-para-comprobar-el-contraste-de-colores</loc>
+		<lastmod>2007-09-13T00:37:44+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 16: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/ajax-accesible-wai-aria</loc>
+		<lastmod>2007-09-11T09:02:59+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 15: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/accesibilidad-y-las-buenas-practicas-para-la-web-movil</loc>
+		<lastmod>2007-09-05T09:17:26+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 14: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/la-accesibilidad-de-los-captchas</loc>
+		<lastmod>2007-09-05T08:51:36+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 10: Comments: 4 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/libros/recomendacion-de-un-libro</loc>
+		<lastmod>2007-08-21T22:34:08+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 9: Comments: 2 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/recopilacion-de-bugs-al-desarrollar-flash-accesible</loc>
+		<lastmod>2007-08-06T22:54:02+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 8: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/manifiesto-de-usabilidad-y-accesibilidad-web-en-mexico</loc>
+		<lastmod>2007-08-06T21:36:02+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 7: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/experto-en-accesibilidad-para-adobe-en-fundamentos-web</loc>
+		<lastmod>2007-07-26T09:22:27+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 6: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/certificacion/mas-informacion-sobre-aenor-y-la-accesibilidad-web</loc>
+		<lastmod>2007-07-24T10:30:42+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 5: Comments: 2 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/descarga-gratuita-de-la-norma-une-de-accesibilidad-web</loc>
+		<lastmod>2007-07-24T10:28:41+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 1: Comments: 1 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/general/certificacion-aenor</loc>
+		<lastmod>2007-07-24T10:28:30+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 3: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/noticias/los-ayuntamientos-y-la-accesibilidad</loc>
+		<lastmod>2007-07-21T19:55:41+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 4: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/herramientas/los-lectores-de-pantalla</loc>
+		<lastmod>2007-07-21T19:54:36+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: Priority report of postID 2: Comments: 0 of 171 = 0 points -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/acerca de</loc>
+		<lastmod>2007-07-16T14:38:19+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.1</priority>
+	</url>
+<!-- Debug: End Postings -->
+<!-- Debug: Start Cats -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category</loc>
+		<lastmod>2007-07-16T14:38:19+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/general</loc>
+		<lastmod>2008-05-20T22:32:07+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/noticias</loc>
+		<lastmod>2008-07-28T08:49:59+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/sitios-web</loc>
+		<lastmod>2007-11-12T09:45:53+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/herramientas</loc>
+		<lastmod>2008-07-29T20:05:55+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/certificacion</loc>
+		<lastmod>2008-07-18T08:41:52+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/libros</loc>
+		<lastmod>2007-09-28T08:56:15+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/legislacion</loc>
+		<lastmod>2008-02-03T20:24:49+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/category/eventos</loc>
+		<lastmod>2008-07-01T22:53:24+00:00</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+<!-- Debug: End Cats -->
+<!-- Debug: Start Archive -->
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/07</loc>
+		<lastmod>2008-07-29T20:05:55+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/05</loc>
+		<lastmod>2008-05-20T22:32:07+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/04</loc>
+		<lastmod>2008-04-17T08:58:52+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/03</loc>
+		<lastmod>2008-03-26T09:51:55+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/02</loc>
+		<lastmod>2008-02-27T10:36:10+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2008/01</loc>
+		<lastmod>2008-01-29T22:54:41+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/12</loc>
+		<lastmod>2007-12-30T20:45:02+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/11</loc>
+		<lastmod>2007-11-30T14:15:15+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/10</loc>
+		<lastmod>2007-10-31T09:52:36+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/09</loc>
+		<lastmod>2007-09-30T11:12:00+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/08</loc>
+		<lastmod>2007-08-21T22:33:14+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://www.accesibilidadweb.com/blog/index.php/2007/07</loc>
+		<lastmod>2007-07-26T09:22:27+00:00</lastmod>
+		<changefreq>yearly</changefreq>
+		<priority>0.5</priority>
+	</url>
+<!-- Debug: End Archive -->
+<!-- Debug: Start Custom Pages -->
+<!-- Debug: End Custom Pages -->
+<!-- Debug: Start additional urls -->
+<!-- Debug: End additional urls -->
+</urlset>

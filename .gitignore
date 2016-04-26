@@ -1,0 +1,9 @@
+*.log
+wp-config.php
+wp-content/backup-db/
+wp-content/upgrade/
+wp-content/uploads/
+
+/sitemap.xml
+/sitemap.xml.gz
+
