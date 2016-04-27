@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package WordPress
+ * @subpackage Default_Theme
+ */
+
 /*
 Template Name: Links
 */
@@ -8,9 +13,9 @@ Template Name: Links
 
 <div id="content" class="widecolumn">
 
-<h2>Links:</h2>
+<h2><?php _e('Links:', 'kubrick'); ?></h2>
 <ul>
-<?php get_links_list(); ?>
+<?php wp_list_bookmarks(); ?>
 </ul>
 
 </div>

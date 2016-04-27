@@ -1,59 +1,83 @@
-edButtons[edButtons.length] = new edButton('ed_AtD', 'AtD', '', '', '');
+/* jshint devel: true, onevar: false, smarttabs: true */
+/* global AtD, QTags, AtD_l10n_r0ar, edButtons, edButton, switchEditors, AtD_unbind_proofreader_listeners */
+/* exported AtD_unbind_proofreader_listeners */
 
+var AtD_qtbutton, autosave;
 /* convienence method to restore the text area from the preview div */
-function AtD_restore_text_area()
-{
-	/* clear the error HTML out of the preview div */
-	AtD.remove('content'); 
+function AtD_restore_text_area() {
+	var content;
 
 	/* swap the preview div for the textarea, notice how I have to restore the appropriate class/id/style attributes */
-
-        var content;
-
-	if (navigator.appName == 'Microsoft Internet Explorer')
-		content = jQuery('#content').html().replace(/<BR.*?class.*?atd_remove_me.*?>/gi, "\n");
-	else
+	if( jQuery('#atd-content').get(0) ) {
+		AtD.remove('atd-content');
+		content = jQuery('#atd-content').html();
+	} else {
+		AtD.remove('content');
 		content = jQuery('#content').html();
+	}
 
-	jQuery('#content').replaceWith( AtD.content_canvas );
-	jQuery('#content').val( content.replace(/\&lt\;/g, '<').replace(/\&gt\;/g, '>').replace(/\&amp;/g, '&') );
-	jQuery('#content').height(AtD.height); 
+	if ( navigator.appName === 'Microsoft Internet Explorer' ) {
+		content = content.replace(/<BR.*?class.*?atd_remove_me.*?>/gi, '\n');
+	}
 
-	/* change the link text back to its original label */
-	jQuery('#ed_AtD').val( AtD.getLang('button_proofread', 'proofread') );
-	jQuery('#ed_AtD').css({ 'color' : '#464646' });
+	// Remove emoji replacement images
+	if ( typeof window.twemoji !== 'undefined' ) {
+		content = content.replace( /<img [^>]+>/g, function( img ) {
+			// The images should have class containing 'emoji'
+			if ( img.indexOf( 'emoji' ) !== -1 ) {
+				var alt = img.match( /alt="([^"]+)"/ );
 
-	/* enable the toolbar buttons */
-	for (var z = 0; z < edButtons.length; z++)
-		if ( edButtons[z].id != 'ed_AtD' )
-			jQuery( '#' + edButtons[z].id ).attr('disabled', false);
+				if ( alt && alt[1] && window.twemoji.test( alt[1] ) ) {
+					return alt[1];
+				}
+			}
 
-	jQuery( '#ed_spell' ).attr( 'disabled', false );
-	jQuery( '#ed_close' ).attr( 'disabled', false );
+			return img;
+		});
+	}
+
+	// jQuery('#content').replaceWith( AtD.content_canvas );
+	jQuery('#content').val( content.replace(/\&lt\;/g, '<').replace(/\&gt\;/g, '>').replace(/\&amp;/g, '&') )
+	.height(AtD.height)
+	.show();
+	jQuery('#atd-content').remove();
+
+	if ( AtD_qtbutton ) {
+		/* change the link text back to its original label */
+		jQuery(AtD_qtbutton).val( AtD.getLang('button_proofread', 'proofread') );
+		jQuery(AtD_qtbutton).css({ 'color' : '#464646' });
+
+		/* enable the toolbar buttons */
+		jQuery( AtD_qtbutton ).siblings('input').andSelf().attr( 'disabled', false );
+	}
 
 	/* restore autosave */
-	if (AtD.autosave != undefined)
-		autosave = AtD.autosave;
-};
-
-/* javascript does some lazy evaluation of function names, have to do the function swap
-   this way to make it work as expected */
-function AtD_replace_show_function( foo ) {
-	var old_button = foo;
-	edShowButton = function(button, i) {
-		if (button.id == 'ed_AtD') {
-			document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" class="ed_button" onclick="AtD_check();" value="' + AtD_l10n_r0ar.button_proofread + '" />');
+	if ( AtD.autosave !== undefined ) {
+		if ( window.wp && window.wp.autosave && window.wp.autosave.server ) {
+			window.wp.autosave.local.resume && window.wp.autosave.local.resume();
+			window.wp.autosave.server.resume && window.wp.autosave.server.resume();
 		} else {
-			old_button(button, i);
+			autosave = AtD.autosave;
 		}
 	}
 }
 
-AtD_replace_show_function( edShowButton );
+// add the AtD button properly to quicktags
+if ( typeof(QTags) !== 'undefined' && QTags.addButton ) {
+	jQuery(document).ready(function(){
+		QTags.addButton( 'AtD', AtD_l10n_r0ar.button_proofread, AtD_check );
+	});
+} else {
+	edButtons[edButtons.length] = new edButton('ed_AtD', 'AtD', '', '', '');
+	jQuery(document).ready(function($){
+		$('#ed_AtD').replaceWith('<input type="button" id="ed_AtD" accesskey="" class="ed_button" onclick="AtD_check(this);" value="' + AtD_l10n_r0ar.button_proofread + '" />');
+	});
+}
 
 function AtD_restore_if_proofreading() {
-	if (jQuery('#ed_AtD').val() == AtD.getLang('button_edit_text', 'edit text')) 
+	if ( AtD_qtbutton && jQuery(AtD_qtbutton).val() === AtD.getLang('button_edit_text', 'edit text') ) {
 		AtD_restore_text_area();
+	}
 }
 
 function AtD_unbind_proofreader_listeners() {
@@ -69,14 +93,46 @@ function AtD_bind_proofreader_listeners() {
 }
 
 /* where the magic happens, checks the spelling or restores the form */
-function AtD_check(callback) {
+function AtD_check(button) {
+	var callback, divHeight;
+
+	if ( jQuery.isFunction( button ) ) {
+		callback = button;
+
+		if ( !AtD_qtbutton ) {
+			AtD_qtbutton = jQuery( '#qt_content_AtD, #ed_AtD' ).get( 0 );
+		}
+	} else {
+		if ( !button.id ) {
+			button = button[0];
+		}
+
+		AtD_qtbutton = button;
+	}
+
+	if ( !jQuery('#content').size() ) {
+		if ( 'undefined' !== typeof callback ) {
+			callback( 0 );
+		}
+		AtD_restore_if_proofreading();
+		return;
+	}
 
 	/* If the text of the link says edit comment, then restore the textarea so the user can edit the text */
-	if (jQuery('#ed_AtD').val() == AtD.getLang('button_edit_text', 'edit text')) {                               
-		AtD_restore_text_area(); 
+
+	if ( jQuery(AtD_qtbutton).val() === AtD.getLang('button_edit_text', 'edit text') ) {
+		AtD_restore_text_area();
 	} else {
+		// Disable editor expand/scroll
+		if ( window.editorExpand && jQuery( '#postdivrich' ).hasClass( 'wp-editor-expand' ) ) {
+			AtD.wpEditorExpand = true;
+			// window.editorExpand.off && window.editorExpand.off();
+		} else {
+			AtD.wpEditorExpand = false;
+		}
+
 		/* initialize some of the stuff related to this plugin */
-		if (AtD.height == undefined) {
+		if ( ! AtD.height ) {
 
 			AtD.height = jQuery('#content').height();
 			AtD_bind_proofreader_listeners();
@@ -94,63 +150,88 @@ function AtD_check(callback) {
 			/* store the autosave, we're going to make it empty during spellcheck to prevent auto saved text from being
 			   over written with empty text */
 			AtD.autosave = autosave;
+		} else {
+			// Update the height
+			AtD.height = jQuery('#content').height();
 		}
 
 		/* set the spell check link to a link that lets the user edit the text */
-		jQuery('#ed_AtD').val(AtD.getLang('button_edit_text', 'edit text'));
-		jQuery('#ed_AtD').css({ 'color' : 'red' });
-
 		/* disable the button to prevent a race condition where content is deleted if proofread is clicked with a check
 		   in progress. */
-		jQuery('#ed_AtD').attr('disabled', true); 
+		jQuery(AtD_qtbutton).css({ 'color' : 'red' }).val( AtD.getLang('button_edit_text', 'edit text') ).attr('disabled', true);
 
 		/* replace the div */
-		var text = jQuery('#content').val().replace(/\&/g, '&amp;').replace(/\</g, '&lt;').replace(/\>/g, '&gt;');
+		var $replacement,
+			$textarea  = jQuery('#content'),
+			text       = $textarea.val().replace( /\&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( /\>/g, '&gt;' ),
+			fontFamily = $textarea.css('font-family'),
+			fontSize   = $textarea.css('font-size'),
+			lineHeight = $textarea.css('line-height');
 
-		if (navigator.appName == 'Microsoft Internet Explorer') {
-			text = text.replace(/[\n\r\f]/gm, '<BR class="atd_remove_me">');
-			var node = jQuery('<div class="input" id="content" style="height: 170px">' + text + '</div>');
-			jQuery('#content').replaceWith(node);
-			node.css( { 'overflow' : 'auto', 'background-color' : 'white', 'color' : 'black' } );
-		} else {
-			jQuery('#content').replaceWith('<div class="input" id="content">' + text + '</div>');
-			jQuery('#content').css( { 'overflow' : 'auto', 'background-color' : 'white', 'color' : 'black', 'white-space' : 'pre-wrap' } );
-			jQuery('#content').height(AtD.height); 
+		if ( navigator.appName === 'Microsoft Internet Explorer' ) {
+			text = text.replace( /[\n\r\f]/gm, '<BR class="atd_remove_me">' );
 		}
 
+		$replacement = jQuery( '<div class="input" id="atd-content">' + text + '</div>' );
+		$textarea.after( $replacement ).hide();
+
+		divHeight = AtD.height;
+		// AtD disables resizing of the Text editor, normalize the size of the replacement div.
+		if ( divHeight < 200 ) {
+			divHeight = 200;
+		} else if ( divHeight > 1000 ) {
+			divHeight = 1000;
+		}
+		var toolBarHeight = jQuery('#ed_toolbar').height();
+		$replacement.css( {
+			overflow:           'auto',
+			'background-color': 'white',
+			color:              'black',
+			'white-space':      'pre-wrap',
+			padding:            '10px',
+			'font-family':      fontFamily || 'Consolas, Monaco, monospace',
+			'font-size':        fontSize || '13px',
+			'line-height':      lineHeight || '1.5',
+			height:             divHeight,
+			'margin-top':       toolBarHeight+7+'px'
+		} );
+
 		/* kill autosave... :) */
-		autosave = function() { };
+		if ( window.wp && window.wp.autosave && window.wp.autosave.server ) {
+			window.wp.autosave.local.suspend && window.wp.autosave.local.suspend();
+			window.wp.autosave.server.suspend && window.wp.autosave.server.suspend();
+		} else {
+			autosave = function() { };
+		}
 
 		/* disable the toolbar buttons */
-		for (var z = 0; z < edButtons.length; z++)
-			if ( edButtons[z].id != 'ed_AtD' )
-				jQuery( '#' + edButtons[z].id ).attr( 'disabled', true );
-
-		jQuery( '#ed_spell' ).attr( 'disabled', true );
-		jQuery( '#ed_close' ).attr( 'disabled', true );
+		jQuery( AtD_qtbutton ).siblings('input').andSelf().attr( 'disabled', true ); // using .arrt instead of .prop so it's compat with older WP and jQuery
 
 		/* check the writing in the textarea */
-		AtD.check('content', {
+		AtD.check('atd-content', {
 			success: function(errorCount) {
-				if (errorCount == 0 && typeof callback === 'undefined')
+				if ( Number( errorCount ) === 0 && typeof callback !== 'function' ) {
 					alert( AtD.getLang('message_no_errors_found', 'No writing errors were found') );
+				}
 				AtD_restore_if_proofreading();
 			},
 
 			ready: function(errorCount) {
-				jQuery('#ed_AtD').attr('disabled', false);
+				jQuery(AtD_qtbutton).attr('disabled', false);
 
-				if( typeof callback !== 'undefined') 
+				if ( typeof callback === 'function' ) {
 					callback( errorCount );
+				}
 			},
 
-			error: function(reason) {
-				jQuery('#ed_AtD').attr('disabled', false);
+			error: function() {
+				jQuery(AtD_qtbutton).attr('disabled', false);
 
-				if( typeof callback !== 'undefined') 
+				if ( typeof callback === 'function' ) {
 					callback( -1 );
-				else 
-					alert( AtD.getLang('message_server_error', 'There was a problem communicating with the After the Deadline service. Try again in one minute.') );
+				} else {
+					alert( AtD.getLang('message_server_error', 'There was a problem communicating with the Proofreading service. Try again in one minute.') );
+				}
 
 				AtD_restore_if_proofreading();
 			},
@@ -158,9 +239,10 @@ function AtD_check(callback) {
 			editSelection: function(element) {
 				var text = prompt( AtD.getLang('dialog_replace_selection', 'Replace selection with:'), element.text() );
 
-				if (text != null)
+				if ( text != null ) {
 					element.replaceWith( text );
-			}, 
+				}
+			},
 
 			explain: function(url) {
 				var left = (screen.width / 2) - (480 / 2);
@@ -174,8 +256,9 @@ function AtD_check(callback) {
 					url : AtD.rpc_ignore + encodeURI( word ).replace( /&/g, '%26'),
 					format : 'raw',
 					error : function(XHR, status, error) {
-						if (AtD.callback_f != undefined && AtD.callback_f.error != undefined)
-							AtD.callback_f.error(status + ": " + error);
+						if ( AtD.callback_f !== undefined && AtD.callback_f.error !== undefined ) {
+							AtD.callback_f.error(status + ': ' + error);
+						}
 					}
 				});
 			}

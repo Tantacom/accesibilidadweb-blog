@@ -1,10 +1,10 @@
 === FeedStats ===
-Contributors: Bueltge
+Contributors: Bueltge, benjaminwittorf, inpsyde
 Donate link: http://bueltge.de/wunschliste/
 Tags: feed, statistics, stats, rss
 Requires at least: 1.5
-Tested up to: 2.7
-Stable tag: 1.3
+Tested up to: 3.5-RC4
+Stable tag: 3.8.1
 
 Simple statistictool for feeds.
 
@@ -22,10 +22,9 @@ _You can customize in options:_
 
 The Plugin is in english language and have the german and traditional chinese translation in language-file. For traditional chinese translation give it a another icon for feedreaders in an button.
 
-Please visit [the official website](http://bueltge.de/wp-feedstats-de-plugin/171/ "FeedStats") for further details and the latest information on this plugin.
+**Made by [Inpsyde](http://inpsyde.com) &middot; We love WordPress**
 
-= Information =
-The version >3.4 has a new style, activate for WordPress 2.5. You can found the version 3.4 in the [SVN](http://svn.wp-plugins.org/feedstats-de/tags/ "SVN").
+Have a look at the premium plugins in our [market](http://marketpress.com).
 
 == Installation ==
 1. Unpack the download-package
@@ -33,9 +32,8 @@ The version >3.4 has a new style, activate for WordPress 2.5. You can found the 
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Got to 'Options' menu and configure the plugin
 
-See on [the official website](http://bueltge.de/wp-feedstats-de-plugin/171/ "FeedStats").
-
 == Screenshots ==
+1. Statistic-area in WordPress 3.4
 1. Statistic-area in WordPress 2.7
 1. Statistic-area in WordPress 2.5
 1. configure-area
@@ -96,17 +94,21 @@ for style-css in traditional Chinese (zh_TW) translation
 for style-css in italien (it_IT) translation
 
 = Acknowledgements =
-FeedReaderButton (gif) by [Christoph Schr&ouml;der](http://www.nasendackel.de "Christoph Schr&ouml;der")
-
-FeedReaderButton (gif - traditional Chinese (zh_TW)) and traditional Chinese translation by [Neil Lin](http://www.wmfield.idv.tw/485 "Neil Lin")
-
-FeedReaderButton (gif - italien (it_IT)) and italien translation by [Gianni Diurno](http://gidibao.net/ "Gianni Diurno")
-
-Turkish translation by [Baris Unver](http://beyn.org "Baris Unver")
-
-French translation by [burningHat](http://blog.burninghat.net/ "burningHat")
-
-Spanich translation by [fportero](http://www.tengotiempo.com "fportero")
+* FeedReaderButton (gif) by [Christoph Schr&ouml;der](http://www.nasendackel.de "Christoph Schr&ouml;der")
+* FeedReaderButton (gif - traditional Chinese (zh_TW)) and traditional Chinese translation by [Neil Lin](http://www.wmfield.idv.tw/485 "Neil Lin")
+* FeedReaderButton (gif - italien (it_IT)) and italien translation by [Gianni Diurno](http://gidibao.net/ "Gianni Diurno")
+* Turkish translation by [Baris Unver](http://beyn.org "Baris Unver")
+* French translation by [burningHat](http://blog.burninghat.net/ "burningHat")
+* Spanich translation by [fportero](http://www.tengotiempo.com "fportero")
+* Thanks to Fat Cow for the belarussian language files.
+* Ukrainian translation by [AzzePis](http://wordpress.co.ua/)
+* Czech translation by [Lelkoun](http://lelkoun.cz)
+* Polish translation by [Online Casino Bluebook](http://www.onlinecasinobluebook.com)
+* Thanks for bulgarian language files to [Web Geek](http://webhostinggeeks.com/)
+* Russian translation by [DachaDecor](http://dachadecor.ru)
+* Thanks to [Brian Flores](http://www.inmotionhosting.com/) for serbian translation
+* Thanks to [Pieter Carette](http://www.siteoptimo.com)
+* Lithuanian translation files by [Vincent G](http://www.host1free.com)
 
 
 = Licence =
@@ -116,12 +118,16 @@ Good news, this plugin is free for everyone! Since it's released under the GPL, 
 The plugin comes with various translations, please refer to the [WordPress Codex](http://codex.wordpress.org/Installing_WordPress_in_Your_Language "Installing WordPress in Your Language") for more information about activating the translation. If you want to help to translate the plugin to your language, please have a look at the sitemap.pot file which contains all defintions and may be used with a [gettext](http://www.gnu.org/software/gettext/) editor like [Poedit](http://www.poedit.net/) (Windows).
 
 
-== Frequently Asked Questions ==
+== Changelog ==
+= 3.8.1 (09/12/2012) =
+* Fix for create new tables to track data with WP 3.4*
 
-= Where can I get more information? =
+= v3.8.0 (13/11/2012) =
+* Fix the different sources for newer WordPress version
+* Different changes on source
+* Enhance the IP check
 
-Please visit [the official website](http://bueltge.de/wp-feedstats-de-plugin/171/ "FeedStats") for the latest information on this plugin.
+= v3.7.3 (07/07/2011) =
+* change capabilities object form int to string
+* kill php warnings and notice
 
-= I love this plugin! How can I show the developer how much I appreciate his work? =
-
-Please visit [the official website](http://bueltge.de/wp-feedstats-de-plugin/171/ "FeedStats") and let him know your care or see the [wishlist](http://bueltge.de/wunschliste/ "Wishlist") of the author.

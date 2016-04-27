@@ -5,17 +5,17 @@
 Plugin Name:  Viper's Video Quicktags
 Plugin URI:   http://www.viper007bond.com/wordpress-plugins/vipers-video-quicktags/
 Description:  Easily embed videos from various video websites such as YouTube, DailyMotion, and Vimeo into your posts.
-Version:      6.3.0
+Version:      6.5.2
 Author:       Viper007Bond
 Author URI:   http://www.viper007bond.com/
 
 **************************************************************************
 
-Copyright (C) 2006-2010 Viper007Bond
+Copyright (C) 2006-2012 Viper007Bond
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free Software Foundation, either version 2 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -26,36 +26,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-**************************************************************************
-
-In short, this plugin is free to use by anyone and everyone. You are
-welcome to use it on a commercial site or whatever you want. However, I do
-very much appreciate donations for all of my time and effort, although
-they obviously aren't required for you to use this plugin. You can even
-just buy me a beer ( http://www.viper007bond.com/donate/ ).
-
-If you sell this code (i.e. are a web developer selling features provided
-via this plugin to clients), it would be very nice if you threw some of
-your profits my way. After all, you are profiting off my hard work. ;)
-
-Thanks and enjoy this plugin!
-
-**************************************************************************
-
-If you're here looking for how to add support for both TinyMCE 2 and
-TinyMCE 3 buttons, then you'll need to check out the legacy version
-of this plugin. The version you are looking at only supports
-WordPress 2.6 and newer to keep the code of this plugin
-siginificantly simpler as well as encourage people to update.
-
-The legacy version can be found here:
-
-http://downloads.wordpress.org/plugin/vipers-video-quicktags.5.4.4.zip
-
 **************************************************************************/
 
 class VipersVideoQuicktags {
-	var $version = '6.3.0';
+	var $version = '6.5.2';
 	var $settings = array();
 	var $defaultsettings = array();
 	var $swfobjects = array();
@@ -66,10 +40,11 @@ class VipersVideoQuicktags {
 	var $wpheadrun = FALSE;
 	var $adminwarned = FALSE;
 	var $customfeedtext;
+	var $buttons = array();
 
 	// Class initialization
 	function VipersVideoQuicktags() {
-		global $wpmu_version, $shortcode_tags, $wp_scripts;
+		global $wp_version, $wpmu_version, $shortcode_tags, $wp_scripts;
 
 		// This version of VVQ requires WordPress 2.8+
 		if ( !function_exists('esc_attr') ) {
@@ -276,7 +251,7 @@ class VipersVideoQuicktags {
 			$upgrade = true;
 		}
 		if ( -1 == version_compare( $usersettings['version'], '6.2.10' ) ) {
-			if ( false !== strpos( $usersettings['customfeedtext'], '<p>' ) || false !== strpos( $usersettings['customfeedtext'], '</p>' ) )
+			if ( ! empty( $usersettings['customfeedtext'] ) && ( false !== strpos( $usersettings['customfeedtext'], '<p>' ) || false !== strpos( $usersettings['customfeedtext'], '</p>' ) ) )
 				$usersettings['customfeedtext'] = str_replace( array( '<p>', '</p>' ), '', $usersettings['customfeedtext'] );
 			$upgrade = true;
 		}
@@ -305,9 +280,9 @@ class VipersVideoQuicktags {
 		add_action( 'admin_post_vvqsettings', array(&$this, 'POSTHandler') );
 		add_action( 'wp_head', array(&$this, 'Head') );
 		add_action( 'admin_head', array(&$this, 'Head') );
-		add_action( 'the_content', array(&$this, 'SWFObjectCalls'), 50 );
+		add_action( 'wp_print_footer_scripts', array(&$this, 'maybe_enqueue_swfobject'), 5 );
+		add_action( 'wp_footer', array(&$this, 'SWFObjectCalls'), 50 );
 		add_filter( 'widget_text', 'do_shortcode', 11 ); // Videos in the text widget
-		add_action( 'widget_text', array(&$this, 'SWFObjectCalls'), 50 );
 
 		// Hide the donate button on WPMU installs as admins probably don't want it there
 		if ( !empty($wpmu_version) ) add_filter( 'vvq_donatebutton', array(&$this, 'ReturnFalse'), 5 );
@@ -347,12 +322,13 @@ class VipersVideoQuicktags {
 			add_shortcode( 'wpvideo', array(&$this, 'shortcode_videopress') );
 
 		// Register other scripts and styles
-		wp_enqueue_script( 'swfobject' );
-		wp_register_script( 'qtobject', plugins_url('/vipers-video-quicktags/resources/qtobject.js'), array(), '1.0.2' );
+		wp_register_script( 'qtobject', plugins_url( 'resources/qtobject.js', __FILE__ ), array(), '1.0.2' );
 		if ( is_admin() ) {
 			// Settings page only
 			if ( isset($_GET['page']) && 'vipers-video-quicktags' == $_GET['page'] ) {
 				add_action( 'admin_head', array(&$this, 'StyleTweaks' ) );
+
+				wp_enqueue_script( 'swfobject' );
 
 				wp_enqueue_script( 'farbtastic' );
 				wp_enqueue_style( 'farbtastic' );
@@ -360,11 +336,10 @@ class VipersVideoQuicktags {
 
 			// Editor pages only
 			if ( in_array( basename($_SERVER['PHP_SELF']), apply_filters( 'vvq_editor_pages', array('post-new.php', 'page-new.php', 'post.php', 'page.php') ) ) ) {
-				add_action( 'admin_head', array(&$this, 'EditorCSS') );
 				add_action( 'admin_footer', array(&$this, 'OutputjQueryDialogDiv') );
 
 				wp_enqueue_script( 'jquery-ui-dialog' );
-				wp_enqueue_style( 'vvq-jquery-ui', plugins_url('/vipers-video-quicktags/resources/vvq-jquery-ui.css'), array(), $this->version, 'screen' );
+				wp_enqueue_style( 'wp-jquery-ui-dialog' );
 
 				// Register editor button hooks
 				add_filter( 'tiny_mce_version', array(&$this, 'tiny_mce_version') );
@@ -376,6 +351,17 @@ class VipersVideoQuicktags {
 				} else {
 					add_filter( 'mce_buttons_' . $this->settings['tinymceline'], array(&$this, 'mce_buttons') );
 				}
+
+				// Adding buttons to the HTML editor in WordPress 3.3+
+				if ( version_compare( $wp_version, '3.3', '>=' ) ) {
+					add_action( 'admin_footer-post.php', array( &$this, 'quicktag_buttons' ) );
+					add_action( 'admin_footer-post-new.php', array( &$this, 'quicktag_buttons' ) );
+				}
+			}
+
+			// Display a warning if FLV button is showing but player isn't installed
+			if ( 1 == $this->settings['flv']['button'] && current_user_can( 'manage_options' ) && ! $this->is_jw_flv_player_installed() ) {
+				add_action( 'admin_notices', array( &$this, 'admin_notices_install_jw_player_warning' ) );
 			}
 		}
 		if ( 1 == $this->settings['quicktime']['dynamicload'] )
@@ -465,6 +451,22 @@ class VipersVideoQuicktags {
 	}
 
 
+	function is_jw_flv_player_installed() {
+		return file_exists( WP_CONTENT_DIR . '/jw-flv-player/player.swf' );
+	}
+
+
+	function admin_notices_install_jw_player_warning() {
+		global $parent_file;
+
+		add_settings_error( 'vvq_options', 'vvq_jw_flv_player_not_installed', sprintf( __( 'IMPORTANT MESSAGE FROM THE VIPER\'S VIDEO QUICKTAGS PLUGIN: In order for your <code>[flv]</code> video embeds to continue to work, you must manually reinstall the JW FLV Player! Please download <a href="%1$s">this ZIP file</a> and then upload the <code>jw-flv-player</code> folder inside of the ZIP to your <code>wp-content</code> folder (%2$s). For details about this change, please see <a href="%3$s">this blog post</a> on the plugin author\'s website. Or if you just had the button enabled but never actually embeded anything using it, you can uncheck the button checkbox on the <a href="%4$s">settings page</a> to hide this message.', 'a8c-developer' ), 'http://v007.me/jwflvplayer', '<code>' . WP_CONTENT_DIR . '/</code>', 'http://v007.me/9a4', admin_url( 'options-general.php?page=vipers-video-quicktags' ) ) );
+
+		// Avoid a double message
+		if ( 'options-general.php' != $parent_file )
+			settings_errors( 'vvq_options' );
+	}
+
+
 	// Check the posts to be displayed looking for the QuickTime tag. If found, load the JS script.
 	function MaybeEnqueueQuicktimeJavascript() {
 		global $wp_query;
@@ -490,7 +492,7 @@ class VipersVideoQuicktags {
 
 	// Load the custom TinyMCE plugin
 	function mce_external_plugins( $plugins ) {
-		$plugins['vipersvideoquicktags'] = plugins_url('/vipers-video-quicktags/resources/tinymce3/editor_plugin.js');
+		$plugins['vipersvideoquicktags'] = add_query_arg( 'ver', $this->version, plugins_url( 'resources/tinymce3/editor_plugin.js', __FILE__ ) );
 		return $plugins;
 	}
 
@@ -502,50 +504,9 @@ class VipersVideoQuicktags {
 	}
 
 
-	// Hide TinyMCE buttons the user doesn't want to see + some misc editor CSS
-	function EditorCSS() {
-		global $user_id;
-
-		echo "<style type='text/css'>\n	#vvq-precacher { display: none; }\n";
-
-		// Attempt to match the dialog box to the admin colors
-		if ( 'classic' == get_user_option('admin_color', $user_id) ) {
-			$color = '#093E56';
-			$background = '#EAF2FA';
-		} else {
-			$color = '#464646';
-			$background = '#DFDFDF';
-		}
-		// Allow plugins with custom admin colors to set their own colors
-		$color      = apply_filters( 'vvq_titlebarcolor',      $color );
-		$background = apply_filters( 'vvq_titlebarbackground', $background );
-
-		echo "	.ui-dialog-titlebar { color: $color; background: $background; }\n";
-
-		$buttons2hide = array();
-		if ( 1 != $this->settings['youtube']['button'] )     $buttons2hide[] = 'YouTube';
-		if ( 1 != $this->settings['googlevideo']['button'] ) $buttons2hide[] = 'GoogleVideo';
-		if ( 1 != $this->settings['dailymotion']['button'] ) $buttons2hide[] = 'DailyMotion';
-		if ( 1 != $this->settings['vimeo']['button'] )       $buttons2hide[] = 'Vimeo';
-		if ( 1 != $this->settings['veoh']['button'] )        $buttons2hide[] = 'Veoh';
-		if ( 1 != $this->settings['viddler']['button'] )     $buttons2hide[] = 'Viddler';
-		if ( 1 != $this->settings['metacafe']['button'] )    $buttons2hide[] = 'Metacafe';
-		if ( 1 != $this->settings['bliptv']['button'] )      $buttons2hide[] = 'BlipTV';
-		if ( 1 != $this->settings['flickrvideo']['button'] ) $buttons2hide[] = 'FlickrVideo';
-		if ( 1 != $this->settings['spike']['button'] )       $buttons2hide[] = 'Spike';
-		if ( 1 != $this->settings['myspace']['button'] )     $buttons2hide[] = 'MySpace';
-		if ( 1 != $this->settings['flv']['button'] )         $buttons2hide[] = 'FLV';
-		if ( 1 != $this->settings['quicktime']['button'] )   $buttons2hide[] = 'Quicktime';
-		if ( 1 != $this->settings['videofile']['button'] )   $buttons2hide[] = 'VideoFile';
-		echo '	.mce_vvq' . implode( ', .mce_vvq', $buttons2hide ) . " { display: none !important; }\n";
-
-		echo "</style>\n";
-	}
-
-
 	// Add the old style buttons to the non-TinyMCE editor views and output all of the JS for the button function + dialog box
 	function AddQuicktagsAndFunctions() {
-		$types = array(
+		$this->buttons = array(
 			'youtube'     => array(
 				__('YouTube', 'vipers-video-quicktags'),
 				__('Embed a video from YouTube', 'vipers-video-quicktags'),
@@ -633,21 +594,24 @@ class VipersVideoQuicktags {
 		);
 
 		$buttonshtml = $datajs = '';
-		foreach ( $types as $type => $strings ) {
-			// HTML for quicktag button
-			if ( 1 == $this->settings[$type]['button'] )
-				$buttonshtml .= '<input type="button" class="ed_button" onclick="VVQButtonClick(\'' . $type . '\')" title="' . $strings[1] . '" value="' . $strings[0] . '" />';
-
+		foreach ( $this->buttons as $type => $strings ) {
 			// Create the data array
 			$datajs .= "	VVQData['$type'] = {\n";
-			$datajs .= '		title: "' . $this->js_escape( ucwords( $strings[1] ) ) . '",' . "\n";
-			$datajs .= '		instructions: "' . $this->js_escape( $strings[2] ) . '",' . "\n";
-			$datajs .= '		example: "' . js_escape( $strings[3] ) . '"';
+			$datajs .= '		title: "' . $this->esc_js( ucwords( $strings[1] ) ) . '",' . "\n";
+			$datajs .= '		instructions: "' . $this->esc_js( $strings[2] ) . '",' . "\n";
+			$datajs .= '		example: "' . esc_js( $strings[3] ) . '"';
 			if ( !empty($this->settings[$type]['width']) && !empty($this->settings[$type]['height']) ) {
 				$datajs .= ",\n		width: " . $this->settings[$type]['width'] . ",\n";
 				$datajs .= '		height: ' . $this->settings[$type]['height'];
 			}
 			$datajs .= "\n	};\n";
+
+			if ( 'flv' == $type && ! $this->is_jw_flv_player_installed() )
+				continue;
+
+			// HTML for quicktag button
+			if ( 1 == $this->settings[$type]['button'] )
+				$buttonshtml .= '<input type="button" class="ed_button" onclick="VVQButtonClick(\'' . $type . '\')" title="' . $strings[1] . '" value="' . $strings[0] . '" />';
 		}
 
 		?>
@@ -657,35 +621,39 @@ class VipersVideoQuicktags {
 	var VVQData = {};
 <?php echo $datajs; ?>
 
-	// Set default heights (IE sucks)
-	if ( jQuery.browser.msie ) {
-		var VVQDialogDefaultHeight = 254;
-		var VVQDialogDefaultExtraHeight = 114;
-	} else {
-		var VVQDialogDefaultHeight = 246;
-		var VVQDialogDefaultExtraHeight = 106;
-	}
-	
+<?php
+	 	$buttons = array();
+		if ( 1 == $this->settings['youtube']['button'] )     $buttons['youtube'] = true;
+		if ( 1 == $this->settings['googlevideo']['button'] ) $buttons['googlevideo'] = true;
+		if ( 1 == $this->settings['dailymotion']['button'] ) $buttons['dailymotion'] = true;
+		if ( 1 == $this->settings['vimeo']['button'] )       $buttons['vimeo'] = true;
+		if ( 1 == $this->settings['veoh']['button'] )        $buttons['veoh'] = true;
+		if ( 1 == $this->settings['viddler']['button'] )     $buttons['viddler'] = true;
+		if ( 1 == $this->settings['metacafe']['button'] )    $buttons['metacafe'] = true;
+		if ( 1 == $this->settings['bliptv']['button'] )      $buttons['bliptv'] = true;
+		if ( 1 == $this->settings['flickrvideo']['button'] ) $buttons['flickrvideo'] = true;
+		if ( 1 == $this->settings['spike']['button'] )       $buttons['spike'] = true;
+		if ( 1 == $this->settings['myspace']['button'] )     $buttons['myspace'] = true;
+		if ( 1 == $this->settings['quicktime']['button'] )   $buttons['quicktime'] = true;
+		if ( 1 == $this->settings['videofile']['button'] )   $buttons['videofile'] = true;
+
+		if ( 1 == $this->settings['flv']['button'] && $this->is_jw_flv_player_installed() )
+			$buttons['flv'] = true;
+
+?>
+	var VVQButtons = <?php echo json_encode( (object) $buttons ); ?>;
+
+
 	// This function is run when a button is clicked. It creates a dialog box for the user to input the data.
 	function VVQButtonClick( tag ) {
 
 		// Close any existing copies of the dialog
 		VVQDialogClose();
 
-		// Calculate the height/maxHeight (i.e. add some height for Blip.tv)
-		VVQDialogHeight = VVQDialogDefaultHeight;
-		VVQDialogMaxHeight = VVQDialogDefaultHeight + VVQDialogDefaultExtraHeight;
-		if ( "bliptv" == tag ) {
-			VVQDialogHeight = VVQDialogDefaultHeight + 16;
-			VVQDialogMaxHeight = VVQDialogMaxHeight + 16;
-		} else if ( "viddler" == tag ) {
-			VVQDialogMaxHeight = VVQDialogDefaultHeight;
-		}
-
 		// Open the dialog while setting the width, height, title, buttons, etc. of it
-		var buttons = { "<?php echo js_escape('Okay', 'vipers-video-quicktags'); ?>": VVQButtonOkay, "<?php echo js_escape('Cancel', 'vipers-video-quicktags'); ?>": VVQDialogClose };
-		var title = '<img src="<?php echo plugins_url('/vipers-video-quicktags/buttons/'); ?>' + tag + '.png" alt="' + tag + '" width="20" height="20" /> ' + VVQData[tag]["title"];
-		jQuery("#vvq-dialog").dialog({ autoOpen: false, width: 750, minWidth: 750, height: VVQDialogHeight, minHeight: VVQDialogHeight, maxHeight: VVQDialogMaxHeight, title: title, buttons: buttons, resize: VVQDialogResizing });
+		var buttons = { "<?php echo esc_js('Okay', 'vipers-video-quicktags'); ?>": VVQButtonOkay, "<?php echo esc_js('Cancel', 'vipers-video-quicktags'); ?>": VVQDialogClose };
+		var title = VVQData[tag]["title"];
+		jQuery("#vvq-dialog").dialog({ autoOpen: false, width: 750, minWidth: 750, title: title, buttons: buttons });
 
 		// Reset the dialog box incase it's been used before
 		jQuery("#vvq-dialog-slide-header").removeClass("selected");
@@ -693,11 +661,11 @@ class VipersVideoQuicktags {
 		jQuery("#vvq-dialog-tag").val(tag);
 
 		// Set the instructions
-		jQuery("#vvq-dialog-message").html("<p>" + VVQData[tag]["instructions"] + "</p><p><strong><?php echo js_escape( __('Example:', 'vipers-video-quicktags') ); ?></strong></p><p><code>" + VVQData[tag]["example"] + "</code></p>");
+		jQuery("#vvq-dialog-message").html("<p>" + VVQData[tag]["instructions"] + "</p><p><strong><?php echo esc_js( __('Example:', 'vipers-video-quicktags') ); ?></strong></p><p><code>" + VVQData[tag]["example"] + "</code></p>");
 
 		// Style the jQuery-generated buttons by adding CSS classes and add second CSS class to the "Okay" button
 		jQuery(".ui-dialog button").addClass("button").each(function(){
-			if ( "<?php echo js_escape('Okay', 'vipers-video-quicktags'); ?>" == jQuery(this).html() ) jQuery(this).addClass("button-highlighted");
+			if ( "<?php echo esc_js('Okay', 'vipers-video-quicktags'); ?>" == jQuery(this).html() ) jQuery(this).addClass("button-highlighted");
 		});
 
 		// Hide the Dimensions box if we can't add dimensions
@@ -722,11 +690,13 @@ class VipersVideoQuicktags {
 		jQuery("#vvq-dialog-input").focus();
 	}
 
-	// Close + reset
+	// Close
 	function VVQDialogClose() {
-		jQuery(".ui-dialog").height(VVQDialogDefaultHeight);
-		jQuery("#vvq-dialog").dialog("close");
+		if (jQuery('#vvq-dialog').dialog('isOpen')) {
+			jQuery("#vvq-dialog").dialog("close");
+		}
 	}
+
 
 	// Callback function for the "Okay" button
 	function VVQButtonOkay() {
@@ -753,36 +723,17 @@ class VipersVideoQuicktags {
 				ed.selection.moveToBookmark(tinymce.EditorManager.activeEditor.windowManager.bookmark);
 
 			ed.execCommand('mceInsertContent', false, text);
-		} else
+		} else {
 			edInsertContent(edCanvas, text);
+		}
 
 		VVQDialogClose();
-	}
-
-	// This function is called while the dialog box is being resized.
-	function VVQDialogResizing( test ) {
-		if ( jQuery(".ui-dialog").height() > VVQDialogHeight ) {
-			jQuery("#vvq-dialog-slide-header").addClass("selected");
-		} else {
-			jQuery("#vvq-dialog-slide-header").removeClass("selected");
-		}
 	}
 
 	// On page load...
 	jQuery(document).ready(function(){
 		// Add the buttons to the HTML view
-		jQuery("#ed_toolbar").append('<?php echo $this->js_escape( $buttonshtml ); ?>');
-
-		// Make the "Dimensions" bar adjust the dialog box height
-		jQuery("#vvq-dialog-slide-header").click(function(){
-			if ( jQuery(this).hasClass("selected") ) {
-				jQuery(this).removeClass("selected");
-				jQuery(this).parents(".ui-dialog").animate({ height: VVQDialogHeight });
-			} else {
-				jQuery(this).addClass("selected");
-				jQuery(this).parents(".ui-dialog").animate({ height: VVQDialogMaxHeight });
-			}
-		});
+		jQuery("#ed_toolbar").append('<?php echo $this->esc_js( $buttonshtml ); ?>');
 
 		// If the Enter key is pressed inside an input in the dialog, do the "Okay" button event
 		jQuery("#vvq-dialog :input").keyup(function(event){
@@ -797,7 +748,31 @@ class VipersVideoQuicktags {
 				return false;
 			});
 		});
+
+		jQuery('#vvq-dialog').dialog({ autoOpen: false });
 	});
+// ]]>
+</script>
+<?php
+	}
+
+
+	// Output Javascript to create the WordPress 3.3+ HTML editor buttons
+	function quicktag_buttons() { ?>
+<script type="text/javascript">
+// <![CDATA[
+<?php
+	// No way to figure out what button is pressed from the callback, so gotta make wrappers
+	foreach ( $this->buttons as $id => $details ) {
+		if ( 'flv' == $id && ! $this->is_jw_flv_player_installed() )
+			continue;
+
+		if ( 1 != $this->settings[$id]['button'] )
+			continue;
+
+		echo "\tQTags.addButton( 'vvq_$id', '" . esc_attr( $details[0] ) . "', function(){VVQButtonClick( '$id' );}, false, false, '" . esc_attr( $details[1] ) . "' );\n";
+	}
+?>
 // ]]>
 </script>
 <?php
@@ -813,17 +788,13 @@ class VipersVideoQuicktags {
 			<p><input type="text" id="vvq-dialog-input" style="width:98%" /></p>
 			<input type="hidden" id="vvq-dialog-tag" />
 		</div>
-		<div id="vvq-dialog-slide-header" class="vvq-dialog-slide ui-dialog-titlebar"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></div>
+		<h3 id="vvq-dialog-slide-header" class="vvq-dialog-slide"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></h3>
 		<div id="vvq-dialog-slide" class="vvq-dialog-slide vvq-dialog-content">
 			<p><?php printf( __("The default dimensions for this video type can be set on this plugin's <a href='%s'>settings page</a>. However, you can set custom dimensions for this one particular video here:", 'vipers-video-quicktags'), admin_url('options-general.php?page=vipers-video-quicktags') ); ?></p>
 			<p><input type="text" id="vvq-dialog-width" class="vvq-dialog-dim" style="width:50px" /> &#215; <input type="text" id="vvq-dialog-height" class="vvq-dialog-dim" style="width:50px" /> pixels</p>
 		</div>
 		</div>
 	</div>
-</div>
-<div id="vvq-precacher">
-	<img src="<?php echo plugins_url('/vipers-video-quicktags/resources/images/333333_7x7_arrow_right.gif'); ?>" alt="" />
-	<img src="<?php echo plugins_url('/vipers-video-quicktags/resources/images/333333_7x7_arrow_down.gif'); ?>" alt="" />
 </div>
 <?php
 	}
@@ -1097,7 +1068,7 @@ class VipersVideoQuicktags {
 	.vvq-swatch {
 		padding: 2px 10px;
 		cursor: pointer;
-		background: transparent url('<?php echo plugins_url('/vipers-video-quicktags/resources/images/color_wheel.png'); ?>') top left no-repeat;
+		background: transparent url('<?php echo esc_url( plugins_url( 'resources/images/color_wheel.png', __FILE__ ) ); ?>') top left no-repeat;
 	}
 	.vvq-preset {
 		float: left;
@@ -1130,34 +1101,8 @@ class VipersVideoQuicktags {
 
 <div class="wrap">
 
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-	<input type="hidden" name="cmd" value="_donations" />
-	<input type="hidden" name="business" value="paypal@viper007bond.com" />
-	<input type="hidden" name="item_name" value="<?php echo attribute_escape( __("Viper's Video Quicktags", 'vipers-video-quicktags') ); ?>" />
-	<input type="hidden" name="no_shipping" value="1" />
-	<input type="hidden" name="return" value="http://www.viper007bond.com/donation-thanks/" />
-	<input type="hidden" name="cancel_return" value="http://www.viper007bond.com/wordpress-plugins/vipers-video-quicktags/" />
-	<input type="hidden" name="cn" value="<?php echo attribute_escape( __('Optional Comment', 'vipers-video-quicktags') ); ?>" />
-	<input type="hidden" name="currency_code" value="USD" />
-	<input type="hidden" name="tax" value="0" />
-	<input type="hidden" name="lc" value="US" />
-	<input type="hidden" name="bn" value="PP-DonationsBF" />
-
-<?php if ( function_exists('screen_icon') ) screen_icon(); ?>
-	<h2>
-<?php
-
-	_e("Viper's Video Quicktags", 'vipers-video-quicktags');
-
-	// Want to get rid of the donate button? Alright, if you insist. :(
-	// Use the "vvq_donatebutton" filter to return FALSE and it'll go away (much better than editing this file).
-	if ( TRUE === apply_filters( 'vvq_donatebutton', TRUE ) )
-		echo '		<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but04.gif" name="submit" alt="Donate" title="' . attribute_escape( __('Donate to Viper007Bond for this plugin via PayPal', 'vipers-video-quicktags') ) . '" style="vertical-align:middle;" />' . "\n";
-
-?>
-	</h2>
-
-	</form>
+	<?php if ( function_exists('screen_icon') ) screen_icon(); ?>
+	<h2><?php _e( "Viper's Video Quicktags", 'vipers-video-quicktags' ); ?></h2>
 
 	<ul class="subsubsub">
 <?php
@@ -1167,10 +1112,16 @@ class VipersVideoQuicktags {
 			'googlevideo' => __('Google Video', 'vipers-video-quicktags'),
 			'dailymotion' => __('DailyMotion', 'vipers-video-quicktags'),
 			'vimeo'       => __('Vimeo', 'vipers-video-quicktags'),
-			'flv'         => __('Flash Video (FLV)', 'vipers-video-quicktags'),
+		);
+
+		if ( $this->is_jw_flv_player_installed() )
+			$tabs['flv'] = __('Flash Video (FLV)', 'vipers-video-quicktags');
+
+		$tabs = array_merge( $tabs, array(
 			'help'        => __('Help', 'vipers-video-quicktags'),
 			'credits'     => __('Credits', 'vipers-video-quicktags'),
-		);
+		) );
+
 		$tabhtml = array();
 
 		// If someone wants to remove a tab (for example on a WPMU intall)
@@ -1204,7 +1155,7 @@ class VipersVideoQuicktags {
 
 			// Confirm pressing of the "reset tab to defaults" button
 			jQuery("#vvq-defaults").click(function(){
-				var areyousure = confirm("<?php echo js_escape( __("Are you sure you want to reset this tab's settings to the defaults?", 'vipers-video-quicktags') ); ?>");
+				var areyousure = confirm("<?php echo esc_js( __("Are you sure you want to reset this tab's settings to the defaults?", 'vipers-video-quicktags') ); ?>");
 				if ( true != areyousure ) return false;
 			});
 		});
@@ -1230,7 +1181,7 @@ class VipersVideoQuicktags {
 			var vvqflashvars = {};
 			var vvqparams = { wmode: "transparent", allowfullscreen: "true", allowscriptaccess: "always" };
 			var vvqattributes = {};
-			var vvqexpressinstall = "<?php echo plugins_url('/vipers-video-quicktags/resources/expressinstall.swf'); ?>";
+			var vvqexpressinstall = "<?php echo plugins_url( 'resources/expressinstall.swf', __FILE__ ); ?>";
 
 
 			/* Color picker code based on code stolen with permission from Ozh's "Liz Comment Counter" */
@@ -1376,7 +1327,7 @@ class VipersVideoQuicktags {
 				// Parse the URL
 				var PreviewID = jQuery("#vvq-previewurl").val().match(/http:\/\/www\.(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com\/(watch\?v=|w\/\?v=)([\w-]+)(.*?)/);
 				if ( !PreviewID ) {
-					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->js_escape( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
+					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->esc_js( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
 					return;
 				}
 				var PreviewID = PreviewID[3];
@@ -1421,15 +1372,15 @@ class VipersVideoQuicktags {
 			VVQMakeYouTubePresets();
 			function VVQMakeYouTubePresets() {
 				var presets = {
-					"<?php echo js_escape( __('Default', 'vipers-video-quicktags') ); ?>": ["<?php echo $this->defaultsettings['youtube']['color1']; ?>", "<?php echo $this->defaultsettings['youtube']['color2']; ?>"],
-					"<?php echo js_escape( __('Dark Grey', 'vipers-video-quicktags') ); ?>": ["#3A3A3A", "#999999"],
-					"<?php echo js_escape( __('Dark Blue', 'vipers-video-quicktags') ); ?>": ["#2B405B", "#6B8AB6"],
-					"<?php echo js_escape( __('Light Blue', 'vipers-video-quicktags') ); ?>": ["#006699", "#54ABD6"],
-					"<?php echo js_escape( __('Green', 'vipers-video-quicktags') ); ?>": ["#234900", "#4E9E00"],
-					"<?php echo js_escape( __('Orange', 'vipers-video-quicktags') ); ?>": ["#E1600F", "#FEBD01"],
-					"<?php echo js_escape( __('Pink', 'vipers-video-quicktags') ); ?>": ["#CC2550", "#E87A9F"],
-					"<?php echo js_escape( __('Purple', 'vipers-video-quicktags') ); ?>": ["#402061", "#9461CA"],
-					"<?php echo js_escape( __('Ruby Red', 'vipers-video-quicktags') ); ?>": ["#5D1719", "#CD311B"]
+					"<?php echo esc_js( __('Default', 'vipers-video-quicktags') ); ?>": ["<?php echo $this->defaultsettings['youtube']['color1']; ?>", "<?php echo $this->defaultsettings['youtube']['color2']; ?>"],
+					"<?php echo esc_js( __('Dark Grey', 'vipers-video-quicktags') ); ?>": ["#3A3A3A", "#999999"],
+					"<?php echo esc_js( __('Dark Blue', 'vipers-video-quicktags') ); ?>": ["#2B405B", "#6B8AB6"],
+					"<?php echo esc_js( __('Light Blue', 'vipers-video-quicktags') ); ?>": ["#006699", "#54ABD6"],
+					"<?php echo esc_js( __('Green', 'vipers-video-quicktags') ); ?>": ["#234900", "#4E9E00"],
+					"<?php echo esc_js( __('Orange', 'vipers-video-quicktags') ); ?>": ["#E1600F", "#FEBD01"],
+					"<?php echo esc_js( __('Pink', 'vipers-video-quicktags') ); ?>": ["#CC2550", "#E87A9F"],
+					"<?php echo esc_js( __('Purple', 'vipers-video-quicktags') ); ?>": ["#402061", "#9461CA"],
+					"<?php echo esc_js( __('Ruby Red', 'vipers-video-quicktags') ); ?>": ["#5D1719", "#CD311B"]
 				};
 				jQuery("#vvq-youtube-presets").html("");
 				for (var i in presets) {
@@ -1473,23 +1424,23 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="hide-if-no-js">
 			<th scope="row"><label for="vvq-previewurl"><?php _e('Preview URL', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-youtube-previewurl" id="vvq-previewurl" value="<?php echo attribute_escape($this->settings['youtube']['previewurl']); ?>" class="vvqwide" />
+				<input type="text" name="vvq-youtube-previewurl" id="vvq-previewurl" value="<?php echo esc_attr($this->settings['youtube']['previewurl']); ?>" class="vvqwide" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></th>
 			<td>
-				<input type="text" name="vvq-youtube-width" id="vvq-width" size="3" value="<?php echo attribute_escape($this->settings['youtube']['width']); ?>" /> &#215;
-				<input type="text" name="vvq-youtube-height" id="vvq-height" size="3" value="<?php echo attribute_escape($this->settings['youtube']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?> 
+				<input type="text" name="vvq-youtube-width" id="vvq-width" size="3" value="<?php echo esc_attr($this->settings['youtube']['width']); ?>" /> &#215;
+				<input type="text" name="vvq-youtube-height" id="vvq-height" size="3" value="<?php echo esc_attr($this->settings['youtube']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="vvq-youtube-aspectratio" id="vvq-aspectratio" value="1"<?php checked($this->settings['youtube']['aspectratio'], 1); ?> /> <?php _e('Maintain aspect ratio', 'vipers-video-quicktags'); ?></label>
-				<input type="hidden" id="vvq-width-default" value="<?php echo attribute_escape($this->defaultsettings['youtube']['width']); ?>" />
-				<input type="hidden" id="vvq-height-default" value="<?php echo attribute_escape($this->defaultsettings['youtube']['height']); ?>" />
+				<input type="hidden" id="vvq-width-default" value="<?php echo esc_attr($this->defaultsettings['youtube']['width']); ?>" />
+				<input type="hidden" id="vvq-height-default" value="<?php echo esc_attr($this->defaultsettings['youtube']['height']); ?>" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><label for="vvq-youtube-color1"><?php _e('Border Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-youtube-color1" id="vvq-youtube-color1" value="<?php echo attribute_escape($this->settings['youtube']['color1']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-youtube-color1" id="vvq-youtube-color1" value="<?php echo esc_attr($this->settings['youtube']['color1']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-youtube-color1-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-youtube-color1-picker-wrap"><div class="vvq-picker" id="vvq-youtube-color1-picker"></div></div>
 			</td>
@@ -1497,7 +1448,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-youtube-color2"><?php _e('Fill Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-youtube-color2" id="vvq-youtube-color2" value="<?php echo attribute_escape($this->settings['youtube']['color2']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-youtube-color2" id="vvq-youtube-color2" value="<?php echo esc_attr($this->settings['youtube']['color2']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-youtube-color2-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-youtube-color2-picker-wrap"><div class="vvq-picker" id="vvq-youtube-color2-picker"></div></div>
 			</td>
@@ -1529,7 +1480,7 @@ class VipersVideoQuicktags {
 				// Parse the URL
 				var PreviewID = jQuery("#vvq-previewurl").val().match(/http:\/\/video\.google\.([A-Za-z.]{2,5})\/videoplay\?docid=([\d-]+)(.*?)/);
 				if ( !PreviewID ) {
-					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->js_escape( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
+					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->esc_js( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
 					return;
 				}
 				var PreviewID = PreviewID[2];
@@ -1569,17 +1520,17 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="hide-if-no-js">
 			<th scope="row"><label for="vvq-previewurl"><?php _e('Preview URL', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-googlevideo-previewurl" id="vvq-previewurl" value="<?php echo attribute_escape($this->settings['googlevideo']['previewurl']); ?>" class="vvqwide" />
+				<input type="text" name="vvq-googlevideo-previewurl" id="vvq-previewurl" value="<?php echo esc_attr($this->settings['googlevideo']['previewurl']); ?>" class="vvqwide" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></th>
 			<td>
-				<input type="text" name="vvq-googlevideo-width" id="vvq-width" size="3" value="<?php echo attribute_escape($this->settings['googlevideo']['width']); ?>" /> &#215;
-				<input type="text" name="vvq-googlevideo-height" id="vvq-height" size="3" value="<?php echo attribute_escape($this->settings['googlevideo']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?> 
+				<input type="text" name="vvq-googlevideo-width" id="vvq-width" size="3" value="<?php echo esc_attr($this->settings['googlevideo']['width']); ?>" /> &#215;
+				<input type="text" name="vvq-googlevideo-height" id="vvq-height" size="3" value="<?php echo esc_attr($this->settings['googlevideo']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="vvq-googlevideo-aspectratio" id="vvq-aspectratio" value="1"<?php checked($this->settings['googlevideo']['aspectratio'], 1); ?> /> <?php _e('Maintain aspect ratio', 'vipers-video-quicktags'); ?></label>
-				<input type="hidden" id="vvq-width-default" value="<?php echo attribute_escape($this->defaultsettings['googlevideo']['width']); ?>" />
-				<input type="hidden" id="vvq-height-default" value="<?php echo attribute_escape($this->defaultsettings['googlevideo']['height']); ?>" />
+				<input type="hidden" id="vvq-width-default" value="<?php echo esc_attr($this->defaultsettings['googlevideo']['width']); ?>" />
+				<input type="hidden" id="vvq-height-default" value="<?php echo esc_attr($this->defaultsettings['googlevideo']['height']); ?>" />
 			</td>
 		</tr>
 		<tr valign="top">
@@ -1609,7 +1560,7 @@ class VipersVideoQuicktags {
 				// Parse the URL
 				var PreviewID = jQuery("#vvq-previewurl").val().match(/http:\/\/(www.dailymotion|dailymotion)\.com\/(.+)\/([0-9a-zA-Z]+)\_(.*?)/);
 				if ( !PreviewID ) {
-					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->js_escape( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
+					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->esc_js( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
 					return;
 				}
 				var PreviewID = PreviewID[3];
@@ -1655,23 +1606,23 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="hide-if-no-js">
 			<th scope="row"><label for="vvq-previewurl"><?php _e('Preview URL', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-previewurl" id="vvq-previewurl" value="<?php echo attribute_escape($this->settings['dailymotion']['previewurl']); ?>" class="vvqwide" />
+				<input type="text" name="vvq-dailymotion-previewurl" id="vvq-previewurl" value="<?php echo esc_attr($this->settings['dailymotion']['previewurl']); ?>" class="vvqwide" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-width" id="vvq-width" size="3" value="<?php echo attribute_escape($this->settings['dailymotion']['width']); ?>" /> &#215;
-				<input type="text" name="vvq-dailymotion-height" id="vvq-height" size="3" value="<?php echo attribute_escape($this->settings['dailymotion']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?> 
+				<input type="text" name="vvq-dailymotion-width" id="vvq-width" size="3" value="<?php echo esc_attr($this->settings['dailymotion']['width']); ?>" /> &#215;
+				<input type="text" name="vvq-dailymotion-height" id="vvq-height" size="3" value="<?php echo esc_attr($this->settings['dailymotion']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?>
 				<input type="hidden" id="vvq-aspectratio" value="0" />
-				<input type="hidden" id="vvq-width-default" value="<?php echo attribute_escape($this->defaultsettings['dailymotion']['width']); ?>" />
-				<input type="hidden" id="vvq-height-default" value="<?php echo attribute_escape($this->defaultsettings['dailymotion']['height']); ?>" />
+				<input type="hidden" id="vvq-width-default" value="<?php echo esc_attr($this->defaultsettings['dailymotion']['width']); ?>" />
+				<input type="hidden" id="vvq-height-default" value="<?php echo esc_attr($this->defaultsettings['dailymotion']['height']); ?>" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><label for="vvq-dailymotion-backgroundcolor"><?php _e('Toolbar Background Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-backgroundcolor" id="vvq-dailymotion-backgroundcolor" value="<?php echo attribute_escape($this->settings['dailymotion']['backgroundcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-dailymotion-backgroundcolor" id="vvq-dailymotion-backgroundcolor" value="<?php echo esc_attr($this->settings['dailymotion']['backgroundcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-dailymotion-backgroundcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-dailymotion-backgroundcolor-picker-wrap"><div class="vvq-picker" id="vvq-dailymotion-backgroundcolor-picker"></div></div>
 			</td>
@@ -1679,7 +1630,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-dailymotion-glowcolor"><?php _e('Toolbar Glow Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-glowcolor" id="vvq-dailymotion-glowcolor" value="<?php echo attribute_escape($this->settings['dailymotion']['glowcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-dailymotion-glowcolor" id="vvq-dailymotion-glowcolor" value="<?php echo esc_attr($this->settings['dailymotion']['glowcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-dailymotion-glowcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-dailymotion-glowcolor-picker-wrap"><div class="vvq-picker" id="vvq-dailymotion-glowcolor-picker"></div></div>
 			</td>
@@ -1687,7 +1638,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-dailymotion-foregroundcolor"><?php _e('Button/Text Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-foregroundcolor" id="vvq-dailymotion-foregroundcolor" value="<?php echo attribute_escape($this->settings['dailymotion']['foregroundcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-dailymotion-foregroundcolor" id="vvq-dailymotion-foregroundcolor" value="<?php echo esc_attr($this->settings['dailymotion']['foregroundcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-dailymotion-foregroundcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-dailymotion-foregroundcolor-picker-wrap"><div class="vvq-picker" id="vvq-dailymotion-foregroundcolor-picker"></div></div>
 			</td>
@@ -1695,7 +1646,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-dailymotion-seekbarcolor"><?php _e('Seekbar Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-dailymotion-seekbarcolor" id="vvq-dailymotion-seekbarcolor" value="<?php echo attribute_escape($this->settings['dailymotion']['seekbarcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-dailymotion-seekbarcolor" id="vvq-dailymotion-seekbarcolor" value="<?php echo esc_attr($this->settings['dailymotion']['seekbarcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-dailymotion-seekbarcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-dailymotion-seekbarcolor-picker-wrap"><div class="vvq-picker" id="vvq-dailymotion-seekbarcolor-picker"></div></div>
 			</td>
@@ -1721,7 +1672,7 @@ class VipersVideoQuicktags {
 				// Parse the URL
 				var PreviewID = jQuery("#vvq-previewurl").val().match(/http:\/\/(www.vimeo|vimeo)\.com(\/|\/clip:)(\d+)(.*?)/);
 				if ( !PreviewID ) {
-					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->js_escape( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
+					jQuery("#vvqvideopreview-container").html('<div id="vvqvideopreview"><?php echo $this->esc_js( __("Unable to parse preview URL. Please make sure it's the <strong>full</strong> URL and a valid one at that.", 'vipers-video-quicktags') ); ?></div>');
 					return;
 				}
 				var PreviewID = PreviewID[3];
@@ -1753,11 +1704,11 @@ class VipersVideoQuicktags {
 			VVQMakeVimeoPresets();
 			function VVQMakeVimeoPresets() {
 				var presets = {
-					"<?php echo js_escape( __('Default (Blue)', 'vipers-video-quicktags') ); ?>": "<?php echo $this->defaultsettings['vimeo']['color']; ?>",
-					"<?php echo js_escape( __('Orange', 'vipers-video-quicktags') ); ?>": "#FF9933",
-					"<?php echo js_escape( __('Lime', 'vipers-video-quicktags') ); ?>": "#C9FF23",
-					"<?php echo js_escape( __('Fuschia', 'vipers-video-quicktags') ); ?>": "#FF0179",
-					"<?php echo js_escape( __('White', 'vipers-video-quicktags') ); ?>": "#FFFFFF"
+					"<?php echo esc_js( __('Default (Blue)', 'vipers-video-quicktags') ); ?>": "<?php echo $this->defaultsettings['vimeo']['color']; ?>",
+					"<?php echo esc_js( __('Orange', 'vipers-video-quicktags') ); ?>": "#FF9933",
+					"<?php echo esc_js( __('Lime', 'vipers-video-quicktags') ); ?>": "#C9FF23",
+					"<?php echo esc_js( __('Fuschia', 'vipers-video-quicktags') ); ?>": "#FF0179",
+					"<?php echo esc_js( __('White', 'vipers-video-quicktags') ); ?>": "#FFFFFF"
 				};
 				jQuery("#vvq-vimeo-presets").html("");
 				for (var i in presets) {
@@ -1797,23 +1748,23 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="hide-if-no-js">
 			<th scope="row"><label for="vvq-previewurl"><?php _e('Preview URL', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-vimeo-previewurl" id="vvq-previewurl" value="<?php echo attribute_escape($this->settings['vimeo']['previewurl']); ?>" class="vvqwide" />
+				<input type="text" name="vvq-vimeo-previewurl" id="vvq-previewurl" value="<?php echo esc_attr($this->settings['vimeo']['previewurl']); ?>" class="vvqwide" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></th>
 			<td>
-				<input type="text" name="vvq-vimeo-width" id="vvq-width" size="3" value="<?php echo attribute_escape($this->settings['vimeo']['width']); ?>" /> &#215;
-				<input type="text" name="vvq-vimeo-height" id="vvq-height" size="3" value="<?php echo attribute_escape($this->settings['vimeo']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?> 
+				<input type="text" name="vvq-vimeo-width" id="vvq-width" size="3" value="<?php echo esc_attr($this->settings['vimeo']['width']); ?>" /> &#215;
+				<input type="text" name="vvq-vimeo-height" id="vvq-height" size="3" value="<?php echo esc_attr($this->settings['vimeo']['height']); ?>" /> <?php _e('pixels', 'vipers-video-quicktags'); ?>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="vvq-vimeo-aspectratio" id="vvq-aspectratio" value="1"<?php checked($this->settings['vimeo']['aspectratio'], 1); ?> /> <?php _e('Maintain aspect ratio', 'vipers-video-quicktags'); ?></label>
-				<input type="hidden" id="vvq-width-default" value="<?php echo attribute_escape($this->defaultsettings['vimeo']['width']); ?>" />
-				<input type="hidden" id="vvq-height-default" value="<?php echo attribute_escape($this->defaultsettings['vimeo']['height']); ?>" />
+				<input type="hidden" id="vvq-width-default" value="<?php echo esc_attr($this->defaultsettings['vimeo']['width']); ?>" />
+				<input type="hidden" id="vvq-height-default" value="<?php echo esc_attr($this->defaultsettings['vimeo']['height']); ?>" />
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><label for="vvq-vimeo-color"><?php _e('Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-vimeo-color" id="vvq-vimeo-color" value="<?php echo attribute_escape($this->settings['vimeo']['color']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-vimeo-color" id="vvq-vimeo-color" value="<?php echo esc_attr($this->settings['vimeo']['color']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-vimeo-color-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-vimeo-color-picker-wrap"><div class="vvq-picker" id="vvq-vimeo-color-picker"></div></div>
 			</td>
@@ -1860,7 +1811,7 @@ class VipersVideoQuicktags {
 				}
 				vvqflvparams["volume"] = "100";
 				vvqflvparams["bufferlength"] = "15";
-				vvqflvparams["skin"] = "<?php echo plugins_url('/vipers-video-quicktags/resources/jw-flv-player/skins/'); ?>" + jQuery("#vvq-flv-skin").val() + ".swf";
+				vvqflvparams["skin"] = "<?php echo content_url('/jw-flv-player/skins/'); ?>" + jQuery("#vvq-flv-skin").val() + ".swf";
 				vvqflvparams["wmode"] = "transparent";
 				vvqflvparams["allowfullscreen"] = "true";
 <?php
@@ -1873,7 +1824,7 @@ class VipersVideoQuicktags {
 ?>
 
 				swfobject.embedSWF(
-					"<?php echo plugins_url('/vipers-video-quicktags/resources/jw-flv-player/player.swf'); ?>",
+					"<?php echo content_url('/jw-flv-player/player.swf'); ?>",
 					"vvqvideopreview",
 					jQuery("#vvq-width").val(),
 					jQuery("#vvq-height").val(),
@@ -1914,19 +1865,19 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="hide-if-no-js">
 			<th scope="row"><label for="vvq-previewurl"><?php _e('Preview URL', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-previewurl" id="vvq-previewurl" value="<?php echo attribute_escape($this->settings['flv']['previewurl']); ?>" size="50" class="vvqwide" /><br />
+				<input type="text" name="vvq-flv-previewurl" id="vvq-previewurl" value="<?php echo esc_attr($this->settings['flv']['previewurl']); ?>" size="50" class="vvqwide" /><br />
 				<?php _e('The default preview video is the most recent featured video on YouTube. You can paste in the URL to a FLV file of your own if you wish.', 'vipers-video-quicktags'); ?>
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e('Dimensions', 'vipers-video-quicktags'); ?></th>
 			<td>
-				<input type="text" name="vvq-flv-width" id="vvq-width" size="3" value="<?php echo attribute_escape($this->settings['flv']['width']); ?>" /> &#215;
-				<input type="text" name="vvq-flv-height" id="vvq-height" size="3" value="<?php echo attribute_escape($this->settings['flv']['height']); ?>" />
+				<input type="text" name="vvq-flv-width" id="vvq-width" size="3" value="<?php echo esc_attr($this->settings['flv']['width']); ?>" /> &#215;
+				<input type="text" name="vvq-flv-height" id="vvq-height" size="3" value="<?php echo esc_attr($this->settings['flv']['height']); ?>" />
 				<?php _e("pixels (if you're using the default skin, add 20 to the height for the control bar)", 'vipers-video-quicktags'); ?> 
 				<input type="hidden" id="vvq-aspectratio" value="0" />
-				<input type="hidden" id="vvq-width-default" value="<?php echo attribute_escape($this->defaultsettings['flv']['width']); ?>" />
-				<input type="hidden" id="vvq-height-default" value="<?php echo attribute_escape($this->defaultsettings['flv']['height']); ?>" />
+				<input type="hidden" id="vvq-width-default" value="<?php echo esc_attr($this->defaultsettings['flv']['width']); ?>" />
+				<input type="hidden" id="vvq-height-default" value="<?php echo esc_attr($this->defaultsettings['flv']['height']); ?>" />
 			</td>
 		</tr>
 		<tr valign="top">
@@ -1952,7 +1903,7 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="vvq-flv-customcolor">
 			<th scope="row"><label for="vvq-flv-backcolor"><?php _e('Control Bar Background Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-backcolor" id="vvq-flv-backcolor" value="<?php echo attribute_escape($this->settings['flv']['backcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-flv-backcolor" id="vvq-flv-backcolor" value="<?php echo esc_attr($this->settings['flv']['backcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-flv-backcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-flv-backcolor-picker-wrap"><div class="vvq-picker" id="vvq-flv-backcolor-picker"></div></div>
 			</td>
@@ -1960,7 +1911,7 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="vvq-flv-customcolor">
 			<th scope="row"><label for="vvq-flv-frontcolor"><?php _e('Icon/Text Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-frontcolor" id="vvq-flv-frontcolor" value="<?php echo attribute_escape($this->settings['flv']['frontcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-flv-frontcolor" id="vvq-flv-frontcolor" value="<?php echo esc_attr($this->settings['flv']['frontcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-flv-frontcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-flv-frontcolor-picker-wrap"><div class="vvq-picker" id="vvq-flv-frontcolor-picker"></div></div>
 			</td>
@@ -1968,7 +1919,7 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="vvq-flv-customcolor">
 			<th scope="row"><label for="vvq-flv-lightcolor"><?php _e('Icon/Text Hover Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-lightcolor" id="vvq-flv-lightcolor" value="<?php echo attribute_escape($this->settings['flv']['lightcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-flv-lightcolor" id="vvq-flv-lightcolor" value="<?php echo esc_attr($this->settings['flv']['lightcolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-flv-lightcolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-flv-lightcolor-picker-wrap"><div class="vvq-picker" id="vvq-flv-lightcolor-picker"></div></div>
 			</td>
@@ -1976,7 +1927,7 @@ class VipersVideoQuicktags {
 		<tr valign="top" class="vvq-flv-customcolor">
 			<th scope="row"><label for="vvq-flv-screencolor"><?php _e('Video Background Color', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-screencolor" id="vvq-flv-screencolor" value="<?php echo attribute_escape($this->settings['flv']['screencolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
+				<input type="text" name="vvq-flv-screencolor" id="vvq-flv-screencolor" value="<?php echo esc_attr($this->settings['flv']['screencolor']); ?>" maxlength="7" size="7" class="vvqnarrow" />
 				&nbsp;<span class="vvq-swatch hide-if-no-js" id="vvq-flv-screencolor-swatch" title="<?php _e('Pick a color', 'vipers-video-quicktags'); ?>">&nbsp;</span>
 				<div class="vvq-picker-wrap hide-if-no-js" id="vvq-flv-screencolor-picker-wrap"><div class="vvq-picker" id="vvq-flv-screencolor-picker"></div></div>
 			</td>
@@ -1984,7 +1935,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-flv-flashvars"><?php _e('Advanced Parameters', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-flv-flashvars" id="vvq-flv-flashvars" value="<?php echo attribute_escape($this->settings['flv']['flashvars']); ?>" size="50" class="vvqwide" /><br />
+				<input type="text" name="vvq-flv-flashvars" id="vvq-flv-flashvars" value="<?php echo esc_attr($this->settings['flv']['flashvars']); ?>" size="50" class="vvqwide" /><br />
 				<?php printf( __('A <a href="%1$s">query-string style</a> list of <a href="%2$s">additional parameters</a> to pass to the player. Example: %3$s', 'vipers-video-quicktags'), 'http://codex.wordpress.org/Template_Tags/How_to_Pass_Tag_Parameters#Tags_with_query-string-style_parameters', 'http://code.jeroenwijering.com/trac/wiki/FlashVars', '<code>autostart=true&amp;playlist=bottom&amp;bufferlength=15</code>' ); ?><br />
 				<?php _e('You will need to press &quot;Save Changes&quot; for these parameters to take effect due to my moderate Javascript skills.', 'vipers-video-quicktags'); ?>
 			</td>
@@ -2064,7 +2015,7 @@ class VipersVideoQuicktags {
 		<tr valign="top">
 			<th scope="row"><label for="vvq-customfeedtext"><?php _e('Feed Text', 'vipers-video-quicktags'); ?></label></th>
 			<td>
-				<input type="text" name="vvq-customfeedtext" id="vvq-customfeedtext" value="<?php echo attribute_escape($this->settings['customfeedtext']); ?>" size="50" class="vvqwide" /><br />
+				<input type="text" name="vvq-customfeedtext" id="vvq-customfeedtext" value="<?php echo esc_attr($this->settings['customfeedtext']); ?>" size="50" class="vvqwide" /><br />
 				<?php printf( __("Optionally enter some custom text to show in your feed in place of videos (as you can't embed videos in feeds). If left blank, it will default to:<br />%s", 'vipers-video-quicktags'), '<code>' . htmlspecialchars($this->customfeedtext) . '</code>' ); ?>
 			</td>
 		</tr>
@@ -2098,7 +2049,7 @@ class VipersVideoQuicktags {
 						$aligncss = str_replace( '\n', "\n", $this->cssalignments[$this->settings['alignment']] );
 						echo str_replace( '/* alignment CSS placeholder */', "<span id='vvq-css-align'>$aligncss</span>", $this->standardcss );
 					?></pre>
-					<textarea name="vvq-customcss" id="vvq-customcss" cols="60" rows="10" style="font-size: 12px;" class="vvqwide code"><?php echo attribute_escape( $this->settings['customcss'] ); ?></textarea>
+					<textarea name="vvq-customcss" id="vvq-customcss" cols="60" rows="10" style="font-size: 12px;" class="vvqwide code"><?php echo esc_attr( $this->settings['customcss'] ); ?></textarea>
 				</div>
 			</td>
 		</tr>
@@ -2163,14 +2114,14 @@ class VipersVideoQuicktags {
 			<p class="vvq-help-title"><?php _e('Where do I get the code from to embed a Viddler video?', 'vipers-video-quicktags'); ?></p>
 			<div>
 				<p><?php _e('Since the URL to a video on Viddler has nothing in common with the embed URL, you must use WordPress.com-style format. Go to the video on Viddler, click the &quot;Embed This&quot; button below the video, and then select the WordPress.com format. You can paste that code directly into a post or Page and it will embed the video.', 'vipers-video-quicktags'); ?></p>
-				<p><img src="<?php echo plugins_url('/vipers-video-quicktags/resources/images/help_viddler.png'); ?>" alt="<?php echo attribute_escape( __('Viddler', 'vipers-video-quicktags') ); ?>" width="572" height="543" /></p>
+				<p><img src="<?php echo esc_url( plugins_url( 'resources/images/help_viddler.png', __FILE__ ) ); ?>" alt="<?php esc_attr_e('Viddler', 'vipers-video-quicktags'); ?>" width="572" height="543" /></p>
 			</div>
 		</li>
 		<li id="vvq-bliptvhelp">
 			<p class="vvq-help-title"><?php _e('Where do I get the code from to embed a Blip.tv video?', 'vipers-video-quicktags'); ?></p>
 			<div>
 				<p><?php _e('Since the URL to a video on Blip.tv has nothing in common with the embed URL, you must use WordPress.com-style format. Go to the video on Blip.tv, click on the yellow &quot;Share&quot; dropdown to the right of the video and select &quot;Embed&quot;. Next select &quot;WordPress.com&quot; from the &quot;Show Player&quot; dropdown. Finally press &quot;Go&quot;. You can paste that code directly into a post or Page and it will embed the video.', 'vipers-video-quicktags'); ?></p>
-				<p><img src="<?php echo plugins_url('/vipers-video-quicktags/resources/images/help_bliptv.png'); ?>" alt="<?php echo attribute_escape( __('Blip.tv', 'vipers-video-quicktags') ); ?>" width="317" height="240" /></p>
+				<p><img src="<?php echo esc_url( plugins_url( 'resources/images/help_bliptv.png', __FILE__ ) ); ?>" alt="<?php esc_attr_e('Blip.tv', 'vipers-video-quicktags'); ?>" width="317" height="240" /></p>
 				<p><?php _e('<strong>NOTE:</strong> Ignore the warning message. This plugin adds support for the WordPress.com so it <strong>will</strong> work on your blog.', 'vipers-video-quicktags'); ?></p>
 			</div>
 		</li>
@@ -2394,12 +2345,13 @@ class VipersVideoQuicktags {
 		<li><?php printf( __('<strong>French:</strong> %s', 'vipers-video-quicktags'), '<a href="http://www.duretz.net/">Laurent Duretz</a>' ); ?></li>
 		<li><?php printf( __('<strong>Hungarian:</strong> %s', 'vipers-video-quicktags'), '<a href="http://filmhirek.com/">jamesb</a>' ); ?></li>
 		<li><?php printf( __('<strong>Italian:</strong> %s', 'vipers-video-quicktags'), '<a href="http://gidibao.net/">Gianni Diurno</a>' ); ?></li>
-		<!--<li><?php printf( __('<strong>Polish:</strong> %s', 'vipers-video-quicktags'), '<a href="http://www.brt12.eu/">Bartosz Sobczyk</a>' ); ?></li>-->
+		<!--<li><?php //printf( __('<strong>Polish:</strong> %s', 'vipers-video-quicktags'), '<a href="http://www.brt12.eu/">Bartosz Sobczyk</a>' ); ?></li>-->
+		<li><?php printf( __('<strong>Romanian:</strong> %s', 'vipers-video-quicktags'), '<a href="http://webhostinggeeks.com/">Web Hosting Geeks</a>' ); ?></li>
 		<li><?php printf( __('<strong>Russian:</strong> %s', 'vipers-video-quicktags'), '<a href="http://handynotes.ru/">Dennis Bri</a>' ); ?></li>
 		<li><?php printf( __('<strong>Spanish:</strong> %s', 'vipers-video-quicktags'), '<a href="http://equipajedemano.info/">Omi</a>' ); ?></li>
 	</ul>
 
-	<p><?php printf( __('If you\'d like to use this plugin in another language and have your name listed here, just translate the strings in the provided <a href="%1$s">template file</a> located in this plugin\'s &quot;<code>localization</code>&quot; folder and then <a href="%2$s">send it to me</a>. For help, see the <a href="%3$s">WordPress Codex</a>.', 'vipers-video-quicktags'), plugins_url('/vipers-video-quicktags/localization/_vipers-video-quicktags-template.po'), 'http://www.viper007bond.com/contact/', 'http://codex.wordpress.org/Translating_WordPress' ); ?></p>
+	<p><?php printf( __('If you\'d like to use this plugin in another language and have your name listed here, just translate the strings in the provided <a href="%1$s">template file</a> located in this plugin\'s &quot;<code>localization</code>&quot; folder and then <a href="%2$s">send it to me</a>. For help, see the <a href="%3$s">WordPress Codex</a>.', 'vipers-video-quicktags'), plugins_url( 'localization/_vipers-video-quicktags-template.po', __FILE__ ), 'http://www.viper007bond.com/contact/', 'http://codex.wordpress.org/Translating_WordPress' ); ?></p>
 
 <?php
 			break; // End credits
@@ -2439,7 +2391,8 @@ class VipersVideoQuicktags {
 			// Agree to the CC non-commercial license before showing FLV button
 			jQuery("#vvq-flvbutton").click(function(){
 				if ( true != jQuery(this).attr("checked") ) return;
-				var agree = confirm("<?php echo js_escape( __("Do you agree to the Creative Commons Attribution-Noncommercial-Share Alike 3.0 Unported license? A link to it can be found to the left.\n\nIn short though, you cannot use JW's FLV Media Player on a commercial site without purchasing a commercial license.", 'vipers-video-quicktags') ); ?>");
+				var agree = confirm("<?php echo esc_js( __("Do you agree to the Creative Commons Attribution-Noncommercial-Share Alike 3.0 Unported license? A link to it can be found to the left.\n\nIn short though, you cannot use JW's FLV Media Player on a commercial site without purchasing a commercial license.", 'vipers-video-quicktags') ); ?>");
+				// '
 				if ( true != agree ) return false;
 			});
 <?php endif; ?>
@@ -2458,7 +2411,7 @@ class VipersVideoQuicktags {
 			</tr>
 		</thead>
 		<tbody>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://www.youtube.com/"><?php _e('YouTube', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[youtube][button]" type="checkbox" value="1"<?php checked($this->settings['youtube']['button'], 1); ?> /></td>
 				<td>
@@ -2484,7 +2437,7 @@ class VipersVideoQuicktags {
 				</td>
 				<td><input name="vvq[googlevideo][aspectratio]" class="vvq-aspectratio" type="checkbox" value="1"<?php checked($this->settings['googlevideo']['aspectratio'], 1); ?> /></td>
 			</tr>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://www.dailymotion.com/"><?php _e('DailyMotion', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[dailymotion][button]" type="checkbox" value="1"<?php checked($this->settings['dailymotion']['button'], 1); ?> /></td>
 				<td>
@@ -2510,7 +2463,7 @@ class VipersVideoQuicktags {
 				</td>
 				<td><input name="vvq[vimeo][aspectratio]" class="vvq-aspectratio" type="checkbox" value="1"<?php checked($this->settings['vimeo']['aspectratio'], 1); ?> /></td>
 			</tr>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://www.veoh.com/"><?php _e('Veoh', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[veoh][button]" type="checkbox" value="1"<?php checked($this->settings['veoh']['button'], 1); ?> /></td>
 				<td>
@@ -2530,7 +2483,7 @@ class VipersVideoQuicktags {
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
 			</tr>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://www.metacafe.com/"><?php _e('Metacafe', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[metacafe][button]" type="checkbox" value="1"<?php checked($this->settings['metacafe']['button'], 1); ?> /></td>
 				<td>
@@ -2556,7 +2509,7 @@ class VipersVideoQuicktags {
 				</td>
 				<td><input name="vvq[bliptv][aspectratio]" class="vvq-aspectratio" type="checkbox" value="1"<?php checked($this->settings['bliptv']['aspectratio'], 1); ?> /></td>
 			</tr>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://www.flickr.com/"><?php _e('Flickr Video', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[flickrvideo][button]" type="checkbox" value="1"<?php checked($this->settings['flickrvideo']['button'], 1); ?> /></td>
 				<td>
@@ -2582,7 +2535,7 @@ class VipersVideoQuicktags {
 				</td>
 				<td><input name="vvq[spike][aspectratio]" class="vvq-aspectratio" type="checkbox" value="1"<?php checked($this->settings['spike']['aspectratio'], 1); ?> /></td>
 			</tr>
-			<tr class="alternate">
+			<tr>
 				<td style="text-align:left"><a href="http://vids.myspace.com/"><?php _e('MySpaceTV', 'vipers-video-quicktags'); ?></a></td>
 				<td><input name="vvq[myspace][button]" type="checkbox" value="1"<?php checked($this->settings['myspace']['button'], 1); ?> /></td>
 				<td>
@@ -2595,6 +2548,11 @@ class VipersVideoQuicktags {
 				</td>
 				<td><input name="vvq[myspace][aspectratio]" class="vvq-aspectratio" type="checkbox" value="1"<?php checked($this->settings['myspace']['aspectratio'], 1); ?> /></td>
 			</tr>
+<?php
+	// Only show the FLV row if the player is installed or the button was already checked
+	// This effectively disables it for new users
+	if ( $this->is_jw_flv_player_installed() || 1 == $this->settings['flv']['button'] ) :
+?>
 			<tr>
 				<td style="text-align:left"><?php
 					_e('Flash Video (FLV)', 'vipers-video-quicktags');
@@ -2602,12 +2560,13 @@ class VipersVideoQuicktags {
 					if ( empty($wpmu_version) )
 						echo '<br /><small>' . sprintf( __('<a href="%1$s">JW\'s FLV Media Player</a> is covered by the <a href="%2$s">Creative Commons Noncommercial<br />license</a> which means you cannot use it on a <a href="%3$s">commercial website</a>.', 'vipers-video-quicktags'), 'http://www.jeroenwijering.com/?item=JW_FLV_Media_Player', 'http://creativecommons.org/licenses/by-nc-sa/3.0/', 'http://www.jeroenwijering.com/?page=order' );
 				?></small></td>
-				<td><input name="vvq[flv][button]" id="vvq-flvbutton" type="checkbox" value="1"<?php checked($this->settings['flv']['button'], 1); ?> /></td>
+				<td><input name="vvq[flv][button]" id="vvq-flvbutton" type="checkbox" value="1" <?php checked($this->settings['flv']['button'], 1); ?> /></td>
 				<td><input name="vvq[flv][width]" type="text" size="5" value="<?php echo $this->settings['flv']['width']; ?>" /></td>
 				<td><input name="vvq[flv][height]" type="text" size="5" value="<?php echo $this->settings['flv']['height']; ?>" /></td>
 				<td>&nbsp;</td>
 			</tr>
-			<tr class="alternate">
+<?php endif; ?>
+			<tr>
 				<td style="text-align:left"><?php _e('Quicktime', 'vipers-video-quicktags'); ?></td>
 				<td><input name="vvq[quicktime][button]" type="checkbox" value="1"<?php checked($this->settings['quicktime']['button'], 1); ?> /></td>
 				<td><input name="vvq[quicktime][width]" type="text" size="5" value="<?php echo $this->settings['quicktime']['width']; ?>" /></td>
@@ -2669,7 +2628,7 @@ class VipersVideoQuicktags {
 	var vvqflashvars = {};
 	var vvqparams = { wmode: "opaque", allowfullscreen: "true", allowscriptaccess: "always" };
 	var vvqattributes = {};
-	var vvqexpressinstall = "<?php echo plugins_url('/vipers-video-quicktags/resources/expressinstall.swf'); ?>";
+	var vvqexpressinstall = "<?php echo plugins_url( 'resources/expressinstall.swf', __FILE__ ); ?>";
 // ]]>
 </script>
 <?php
@@ -2745,6 +2704,12 @@ class VipersVideoQuicktags {
 	}
 
 
+	// Is a string a URL? Not as perfect as esc_url() validation but it'll do
+	function is_url( $string ) {
+		return preg_match( '#^https?://#i', $string );
+	}
+
+
 	// Reverse the parts we care about (and probably some we don't) of wptexturize() which gets applied before shortcodes
 	function wpuntexturize( $text ) {
 		$find = array( '&#8211;', '&#8212;', '&#215;', '&#8230;', '&#8220;', '&#8217;s', '&#8221;', '&#038;' );
@@ -2814,31 +2779,50 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'youtube', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
+		if ( $this->is_url( $content ) ) {
 
-			// Playlist URL
-			if ( FALSE !== stristr( $content, 'view_play_list' ) ) {
-				preg_match( '#http://(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com/view_play_list\?p=([\w-]+)(.*?)#i', $content, $matches );
+			// Playlist URL ( http://www.youtube.com/playlist?list=PLXXXXX )
+			if ( false !== stristr( $content, 'playlist' ) ) {
+				preg_match( '#https?://(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com/playlist\?list=([\w-]+)(.*?)#i', $content, $matches );
+				if ( empty( $matches ) || empty( $matches[2] ) )
+					return $this->error( sprintf( __( 'Unable to parse URL, check for correct %s format', 'vipers-video-quicktags' ), __( 'YouTube' ) ) );
+
+				// Hack until this plugin properly supports iframe-based embeds
+				$iframe = 'http://www.youtube.com/embed/videoseries?list=' . $matches[2];
+			}
+			// Legacy playlists ( http://www.youtube.com/view_play_list?p=XXX )
+			elseif ( FALSE !== stristr( $content, 'view_play_list' ) ) {
+				preg_match( '#https?://(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com/view_play_list\?p=([\w-]+)(.*?)#i', $content, $matches );
 				if ( empty($matches) || empty($matches[2]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('YouTube') ) );
 
 				$embedpath = 'p/' . $matches[2];
 				$fallbacklink = $fallbackcontent = 'http://www.youtube.com/view_play_list?p=' . $matches[2];
 			}
+			// Short youtu.be URL
+			elseif ( FALSE !== stristr( $content, 'youtu.be' ) ) {
+				preg_match( '#https?://youtu\.be/([\w-]+)#i', $content, $matches );
+				if ( empty($matches) || empty($matches[1]) )
+					return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('YouTube') ) );
+
+				$embedpath = 'v/' . $matches[1];
+				$fallbacklink = 'http://www.youtube.com/watch?v=' . $matches[1];
+				$fallbackcontent = '<img src="' . esc_url( 'http://img.youtube.com/vi/' . $matches[1] . '/0.jpg' ) . '" alt="' . esc_attr__('YouTube Preview Image', 'vipers-video-quicktags') . '" />';
+			}
 			// Normal video URL
 			else {
-				preg_match( '#http://(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com/(watch\?v=|w/\?v=|\?v=)([\w-]+)(.*?)#i', $content, $matches );
+				preg_match( '#https?://(www.youtube|youtube|[A-Za-z]{2}.youtube)\.com/(watch\?v=|w/\?v=|\?v=)([\w-]+)(.*?)#i', $content, $matches );
 				if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('YouTube') ) );
 
 				$embedpath = 'v/' . $matches[3];
 				$fallbacklink = 'http://www.youtube.com/watch?v=' . $matches[3];
-				$fallbackcontent = '<img src="http://img.youtube.com/vi/' . $matches[3] . '/0.jpg" alt="' . __('YouTube Preview Image', 'vipers-video-quicktags') . '" />';
+				$fallbackcontent = '<img src="' . esc_url( 'http://img.youtube.com/vi/' . $matches[3] . '/0.jpg' ) . '" alt="' . esc_attr__('YouTube Preview Image', 'vipers-video-quicktags') . '" />';
 			}
 		}
 		// If a URL wasn't passed, assume a video ID was passed instead
 		else {
 			$embedpath = 'v/' . $content;
 			$fallbacklink = 'http://www.youtube.com/watch?v=' . $content;
-			$fallbackcontent = '<img src="http://img.youtube.com/vi/' . $content . '/0.jpg" alt="' . __('YouTube Preview Image', 'vipers-video-quicktags') . '" />';
+			$fallbackcontent = '<img src="' . esc_url( 'http://img.youtube.com/vi/' . $content . '/0.jpg' ) . '" alt="' . esc_attr__('YouTube Preview Image', 'vipers-video-quicktags') . '" />';
 		}
 
 		// Setup the parameters
@@ -2867,8 +2851,16 @@ class VipersVideoQuicktags {
 		$showsearch = ( 1 == $atts['showsearch'] ) ? '1' : '0';
 		$showinfo   = ( 1 == $atts['showinfo'] ) ? '1' : '0';
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('youtube');
+
+		// Hack until this plugin properly supports iframe-based embeds
+		if ( ! empty( $iframe ) ) {
+			return '<iframe class="vvqbox vvqyoutube" width="' . esc_attr( $atts['width'] ) . '" height="' . esc_attr( $atts['height'] ) . '" src="'. esc_url( $iframe . '&rel=' . $rel . '&fs=' . $fs . '&showsearch=' . $showsearch . '&showinfo=' . $showinfo . $autoplay . $loop . $hd ) . '" frameborder="0" allowfullscreen></iframe>';
+		}
 
 		$this->swfobjects[$objectid] = array(
 			'width' => $atts['width'],
@@ -2876,7 +2868,7 @@ class VipersVideoQuicktags {
 			'url' => 'http://www.youtube.com/' . $embedpath . $color1 . $color2 . $border . '&rel=' . $rel . '&fs=' . $fs . '&showsearch=' . $showsearch . '&showinfo=' . $showinfo . $autoplay . $loop . $hd,
 		);
 
-		return '<span class="vvqbox vvqyoutube" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="' . $fallbacklink . '">' . $fallbackcontent . '</a></span></span>';
+		return '<span class="vvqbox vvqyoutube" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( $fallbacklink ) . '">' . $fallbackcontent . '</a></span></span>';
 	}
 
 
@@ -2910,8 +2902,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'googlevideo', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://video\.google\.([A-Za-z.]{2,5})/videoplay\?docid=([\d-]+)(.*?)#i', $content, $matches );
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://video\.google\.([A-Za-z.]{2,5})/videoplay\?docid=([\d-]+)(.*?)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[2]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('Google Video', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[2];
@@ -2926,12 +2918,14 @@ class VipersVideoQuicktags {
 		if ( 1 == $atts['autoplay'] ) $flashvars['autoplay'] = '1';
 		if ( 1 == $atts['fs'] )       $flashvars['fs']       = 'true';
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
 
 		$objectid = $this->videoid('googlevideo');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://video.google.com/googleplayer.swf?docid=' . $videoid, 'flashvars' => $flashvars );
 
-		return '<span class="vvqbox vvqgooglevideo" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://video.google.com/videoplay?docid=' . $videoid . '">http://video.google.com/videoplay?docid=' . $videoid . '</a></span></span>';
+		return '<span class="vvqbox vvqgooglevideo" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://video.google.com/videoplay?docid=' . $videoid ) . '">' . esc_url( 'http://video.google.com/videoplay?docid=' . $videoid ) . '</a></span></span>';
 	}
 
 
@@ -2962,9 +2956,9 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'dailymotion', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
+		if ( $this->is_url( $content ) ) {
 			//http://www.dailymotion.com/visited/search/top%2Bgear/video/x347lz_bugatti-veyron-407-kmh-la-plus-rapi_shortfilms
-			preg_match( '#http://(www.dailymotion|dailymotion)\.com/(.+)/([0-9a-zA-Z]+)\_(.*?)#i', $content, $matches );
+			preg_match( '#https?://(www.dailymotion|dailymotion)\.com/(.+)/([0-9a-zA-Z]+)\_(.*?)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('DailyMotion', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[3];
@@ -2983,12 +2977,15 @@ class VipersVideoQuicktags {
 		$autoplay = ( 1 == $atts['autoplay'] ) ? '1' : '0';
 		$related = ( 1 == $atts['related'] ) ? '1' : '0';
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('dailymotion');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://www.dailymotion.com/swf/' . $videoid . '&colors=' . $backgroundcolor . $glowcolor . $foregroundcolor . $seekbarcolor . '&autoPlay=' . $autoplay . '&related=' . $related );
 
-		return '<span class="vvqbox vvqdailymotion" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://www.dailymotion.com/video' . $videoid . '">http://www.dailymotion.com/video' . $videoid . '</a></span></span>';
+		return '<span class="vvqbox vvqdailymotion" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://www.dailymotion.com/video/' . $videoid ) . '">' . esc_url( 'http://www.dailymotion.com/video/' . $videoid ) . '</a></span></span>';
 	}
 
 
@@ -3025,8 +3022,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'vimeo', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://(www.vimeo|vimeo)\.com(/|/clip:)(\d+)(.*?)#i', $content, $matches );
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://(www.vimeo|vimeo)\.com(/|/clip:)(\d+)(.*?)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('Vimeo', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[3];
@@ -3042,7 +3039,7 @@ class VipersVideoQuicktags {
 		$byline     = ( 1 == $atts['byline'] )     ? '1' : '0';
 		$fullscreen = ( 1 == $atts['fullscreen'] ) ? '1' : '0';
 
-		$iframeurl = 'http://player.vimeo.com/video/' . $videoid;
+		$iframeurl = '//player.vimeo.com/video/' . $videoid;
 		foreach ( array( 'title', 'byline', 'portrait', 'fullscreen' ) as $attribute ) {
 			$iframeurl = add_query_arg( $attribute, $$attribute, $iframeurl );
 		}
@@ -3050,9 +3047,13 @@ class VipersVideoQuicktags {
 		if ( '' != $atts['color'] && $this->defaultsettings['vimeo']['color'] != $atts['color'] )
 			$iframeurl = add_query_arg( 'color', str_replace( '#', '', $atts['color'] ), $iframeurl );
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
+
 		$objectid = $this->videoid('vimeo');
 
-		return '<span class="vvqbox vvqvimeo" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><iframe id="' . $objectid . '" src="' . esc_attr( $iframeurl ) . '" width="' . $atts['width'] . '" height="' . $atts['height'] . '" frameborder="0"><a href="http://www.vimeo.com/' . $videoid . '">http://www.vimeo.com/' . $videoid . '</a></iframe></span>';
+		return '<span class="vvqbox vvqvimeo" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><iframe id="' . esc_attr( $objectid ) . '" src="' . esc_url( $iframeurl ) . '" width="' . esc_attr( $atts['width'] ) . '" height="' . esc_attr( $atts['height'] ) . '" frameborder="0"><a href="' . esc_url( 'http://www.vimeo.com/' . $videoid ) . '">' . esc_url( 'http://www.vimeo.com/' . $videoid ) . '</a></iframe></span>';
 	}
 
 
@@ -3078,17 +3079,17 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'veoh', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
+		if ( $this->is_url( $content ) ) {
 			$videoid = null;
 
 			// Old format
-			preg_match( '#http://(www.veoh|veoh)\.com/videos/([0-9a-zA-Z]+)(.*?)#i', $content, $matches );
+			preg_match( '#https?://(www.veoh|veoh)\.com/videos/([0-9a-zA-Z]+)(.*?)#i', $content, $matches );
 			if ( !empty($matches) && !empty($matches[2]) )
 				$videoid = $matches[2];
 
 			// Must be the new format then
 			if ( empty($videoid) ) {
-				preg_match( '#http://(www.veoh|veoh)\.com/(.*?)/watch/([0-9a-zA-Z]+)(.*?)#i', $content, $matches );
+				preg_match( '#https?://(www.veoh|veoh)\.com/(.*?)/watch/([0-9a-zA-Z]+)(.*?)#i', $content, $matches );
 				if ( !empty($matches) && !empty($matches[3]) )
 					$videoid = $matches[3];
 			}
@@ -3100,6 +3101,9 @@ class VipersVideoQuicktags {
 		else {
 			$videoid = $content;
 		}
+
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
 
 
 		$objectid = $this->videoid('veoh');
@@ -3115,7 +3119,7 @@ class VipersVideoQuicktags {
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://www.veoh.com/veohplayer.swf', 'flashvars' => $flashvars );
 
-		return '<span class="vvqbox vvqveoh" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://www.veoh.com/videos/' . $videoid . '">http://www.veoh.com/videos/' . $videoid . '</a></span></span>';
+		return '<span class="vvqbox vvqveoh" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://www.veoh.com/videos/' . $videoid ) . '">' . esc_url( 'http://www.veoh.com/videos/' . $videoid ) . '</a></span></span>';
 	}
 
 
@@ -3145,12 +3149,15 @@ class VipersVideoQuicktags {
 
 		if ( empty($videoid) || empty($width) || empty($height) ) return $this->error( sprintf( __('An invalid %s shortcode format was used. Please check your code.', 'vipers-video-quicktags'), __('Viddler', 'vipers-video-quicktags') ) );
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('viddler');
 
 		$this->swfobjects[$objectid] = array( 'width' => $width, 'height' => $height, 'url' => 'http://www.viddler.com/player/' . $videoid . '/' );
 
-		return '<span class="vvqbox vvqviddler" style="width:' . $width . 'px;height:' . $height . 'px;"><span id="' . $objectid . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Viddler', 'vipers-video-quicktags') ) . '</em></span></span>';
+		return '<span class="vvqbox vvqviddler" style="' . esc_attr( 'width:' . $width . 'px;height:' . $height . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Viddler', 'vipers-video-quicktags') ) . '</em></span></span>';
 	}
 
 
@@ -3175,8 +3182,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'metacafe', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://(www.metacafe|metacafe)\.com/watch/(.*?)/(.*?)#i', $content, $matches );
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://(www.metacafe|metacafe)\.com/watch/(.*?)/(.*?)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[2]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('Metacafe', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[2];
@@ -3186,12 +3193,15 @@ class VipersVideoQuicktags {
 			$videoid = $content;
 		}
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('metacafe');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://www.metacafe.com/fplayer/' . $videoid . '/vipers_video_quicktags.swf' );
 
-		return '<span class="vvqbox vvqmetacafe" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://www.metacafe.com/watch/' . $videoid . '/">http://www.metacafe.com/watch/' . $videoid . '/</a></span></span>';
+		return '<span class="vvqbox vvqmetacafe" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://www.metacafe.com/watch/' . $videoid . '/' ) . '">' . esc_url( 'http://www.metacafe.com/watch/' . $videoid . '/' ) . '</a></span></span>';
 	}
 
 
@@ -3220,12 +3230,15 @@ class VipersVideoQuicktags {
 		if ( empty($params['?posts_id']) ) return $this->error( sprintf( __('An invalid %s shortcode format was used. Please check your code.', 'vipers-video-quicktags'), __('Blip.tv', 'vipers-video-quicktags') ) );
 		$videoid = $params['?posts_id'];
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('bliptv');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://blip.tv/scripts/flash/showplayer.swf?file=http://blip.tv/rss/flash/' . $videoid );
 
-		return '<span class="vvqbox vvqbliptv" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Blip.tv', 'vipers-video-quicktags') ) . '</em></span></span>';
+		return '<span class="vvqbox vvqbliptv" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Blip.tv', 'vipers-video-quicktags') ) . '</em></span></span>';
 	}
 
 
@@ -3268,11 +3281,15 @@ class VipersVideoQuicktags {
 		if ( !$atts['height'] )
 			$atts['height'] = round( ( $atts['width'] / $this->settings['wpvideo']['width'] ) * $this->settings['wpvideo']['height'] );
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
+
 		$objectid = $this->videoid('wpvideo');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://s0.videopress.com/player.swf?v=1.01', 'flashvars' => array( 'guid' => $atts[0], 'seamlesstabbing' => 'true', 'overstretch' => 'true' ) );
 
-		return '<span class="vvqbox vvqvideopress" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('VideoPress', 'vipers-video-quicktags') ) . '</em></span></span>';
+		return '<span class="vvqbox vvqvideopress" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('VideoPress', 'vipers-video-quicktags') ) . '</em></span></span>';
 	}
 
 
@@ -3305,8 +3322,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'flickrvideo', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://(www.flickr|flickr)\.com/photos/(.+)/(\d+)(.*?)#i', $content, $matches );
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://(www.flickr|flickr)\.com/photos/(.+)/(\d+)(.*?)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('Flickr Video', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[3];
@@ -3315,6 +3332,9 @@ class VipersVideoQuicktags {
 		else {
 			$videoid = $content;
 		}
+
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
 
 
 		// Setup the parameters
@@ -3325,7 +3345,7 @@ class VipersVideoQuicktags {
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://www.flickr.com/apps/video/stewart.swf?v=1.161', 'flashvars' => array( 'photo_id' => $videoid, 'flickr_show_info_box' => $showinfobox ) );
 
-		return '<span class="vvqbox vvqflickrvideo" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://www.google.com/search?q=site%3Aflickr.com+' . $videoid . '">' . __('Flickr Video', 'vipers-video-quicktags') . '</a></span></span>';
+		return '<span class="vvqbox vvqflickrvideo" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://www.google.com/search?q=site%3Aflickr.com+' . $videoid ) . '">' . __('Flickr Video', 'vipers-video-quicktags') . '</a></span></span>';
 	}
 
 
@@ -3350,8 +3370,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'spike', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://(www.ifilm|ifilm|www.spike|spike)\.com/(.+)/(\d+)#i', $content, $matches );
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://(www.ifilm|ifilm|www.spike|spike)\.com/(.+)/(\d+)#i', $content, $matches );
 			if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('IFILM/Spike', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[3];
@@ -3361,12 +3381,15 @@ class VipersVideoQuicktags {
 			$videoid = $content;
 		}
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('ifilm');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://www.spike.com/efp', 'flashvars' => array( 'flvbaseclip' => $videoid ) );
 
-		return '<span class="vvqbox vvqifilm" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://www.spike.com/video/' . $videoid . '">http://www.spike.com/video/' . $videoid . '</a></span></span>';
+		return '<span class="vvqbox vvqifilm" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://www.spike.com/video/' . $videoid ) . '">' . esc_url( 'http://www.spike.com/video/' . $videoid ) . '</a></span></span>';
 	}
 
 
@@ -3391,8 +3414,8 @@ class VipersVideoQuicktags {
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'myspace', $origatts );
 
 		// If a URL was passed
-		if ( 'http://' == substr( $content, 0, 7 ) ) {
-			preg_match( '#http://(vids.myspace|myspacetv)\.com/index\.cfm\?fuseaction=vids\.individual(.+)videoid=(\d+)#i', $content, $matches ); // Had issues with the "&"
+		if ( $this->is_url( $content ) ) {
+			preg_match( '#https?://(vids.myspace|myspacetv)\.com/index\.cfm\?fuseaction=vids\.individual(.+)videoid=(\d+)#i', $content, $matches ); // Had issues with the "&"
 			if ( empty($matches) || empty($matches[3]) ) return $this->error( sprintf( __('Unable to parse URL, check for correct %s format', 'vipers-video-quicktags'), __('MySpace', 'vipers-video-quicktags') ) );
 
 			$videoid = $matches[3];
@@ -3402,17 +3425,23 @@ class VipersVideoQuicktags {
 			$videoid = $content;
 		}
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('myspace');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => 'http://mediaservices.myspace.com/services/media/embed.aspx/m=' . $videoid );
 
-		return '<span class="vvqbox vvqmyspace" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="http://myspacetv.com/index.cfm?fuseaction=vids.individual&amp;videoid=' . $videoid . '">http://myspacetv.com/index.cfm?fuseaction=vids.individual&amp;videoid=' . $videoid . '</a></span></span>';
+		return '<span class="vvqbox vvqmyspace" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( 'http://myspacetv.com/index.cfm?fuseaction=vids.individual&amp;videoid=' . $videoid ) . '">' . esc_url( 'http://myspacetv.com/index.cfm?fuseaction=vids.individual&amp;videoid=' . $videoid ) . '</a></span></span>';
 	}
 
 
 	// Handle FLV videos
 	function shortcode_flv( $atts, $content = '' ) {
+		if ( ! $this->is_jw_flv_player_installed() )
+			return $this->error( __( 'FLV shortcode is disabled until you install JW FLV Player! See the admin area for details.', 'vipers-video-quicktags' ) );
+
 		$origatts = $atts;
 		$content = $this->wpuntexturize( $content );
 
@@ -3450,7 +3479,7 @@ class VipersVideoQuicktags {
 
 		// Skin
 		if ( !empty($this->settings['flv']['skin']) && !empty($this->flvskins[$this->settings['flv']['skin']]) )
-			$flashvars['skin'] = plugins_url('/vipers-video-quicktags/resources/jw-flv-player/skins/' . $this->settings['flv']['skin'] . '.swf');
+			$flashvars['skin'] = content_url('/jw-flv-player/skins/' . $this->settings['flv']['skin'] . '.swf');
 
 		// Custom colors
 		if ( 1 == $atts['customcolors'] || !empty($origatts['backcolor']) )
@@ -3494,14 +3523,17 @@ class VipersVideoQuicktags {
 			$flashvars['streamer'] = substr( $content, 0, $flv_pos );
 		}
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('flv');
 
-		$swfurl = plugins_url('/vipers-video-quicktags/resources/jw-flv-player/player.swf');
+		$swfurl = content_url('/jw-flv-player/player.swf');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => $swfurl, 'flashvars' => $flashvars );
 
-		return '<span class="vvqbox vvqflv" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><a href="' . $swfurl . '?file=' . urlencode($content) . '">' . htmlspecialchars( $content ) . '</a></span></span>';
+		return '<span class="vvqbox vvqflv" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><a href="' . esc_url( $swfurl . '?file=' . rawurlencode($content) ) . '">' . esc_html( $content ) . '</a></span></span>';
 	}
 
 
@@ -3525,29 +3557,49 @@ class VipersVideoQuicktags {
 			'useplaceholder' => 0,
 			'placeholder'    => str_replace( '.mov', '.jpg', $content ),
 			'controller'     => 1,
-
+			'bgcolor'        => '',
 		), $atts);
 
 		// Allow other plugins to modify these values (for example based on conditionals)
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'quicktime', $origatts );
 
+		$qt_args = array(
+			'scale' => 'aspect',
+		);
 
 		if ( 1 == $atts['useplaceholder'] && !empty($atts['placeholder']) ) {
 			$mov = $atts['placeholder'];
-			$href = ' myQTObject.addParam("href", "' . $content . '"); myQTObject.addParam("target", "myself");';
+			$qt_args['href'] = $content;
+			$qt_args['target'] = 'myself';
 		} else {
 			$mov = $content;
-			$href = '';
 		}
 
 		if ( 1 == $atts['autostart'] )
-			$autoplay = 'true';
+			$qt_args['autoplay'] = 'true';
 		else
-			$autoplay = ( 1 == $atts['autoplay'] ) ? 'true' : 'false';
+			$qt_args['autoplay'] = ( 1 == $atts['autoplay'] ) ? 'true' : 'false';
 
-		$controller = ( 1 == $atts['controller'] ) ? 'true' : 'false';
+		$qt_args['controller'] = ( 1 == $atts['controller'] ) ? 'true' : 'false';
 
-		return '<span class="vvqbox vvqquicktime" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><script type="text/javascript">var myQTObject = new QTObject("' . $mov . '", "' . $this->videoid('quicktime') . '", "' . $atts['width'] . '", "' . $atts['height'] . '");' . $href . ' myQTObject.addParam("autoplay", "' . $autoplay . '"); myQTObject.addParam("controller", "' . $controller . '"); myQTObject.addParam("scale", "aspect"); myQTObject.write();</script></span>';
+		if ( ! empty( $atts['bgcolor'] ) )
+			$qt_args['bgcolor'] = $atts['bgcolor'];
+
+		// Use this to inject extra myQTObject.addParam() entries
+		$qt_args = apply_filters( 'vvq_quicktime_args', $qt_args );
+
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
+
+		$html = '<span class="vvqbox vvqquicktime" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><script type="text/javascript">' . "var myQTObject = new QTObject( '" . esc_js( $mov ) . "', '" . esc_js( $this->videoid('quicktime') ) . "', '" . esc_js( $atts['width'] ) . "', '" . esc_js( $atts['height'] ) . "');";
+
+		foreach ( $qt_args as $name => $value )
+			$html .= " myQTObject.addParam( '" . esc_js( $name ) . "', '" . esc_js( $value ) . "' );";
+
+		$html .= ' myQTObject.write();</script></span>';
+
+		return $html;
 	}
 
 
@@ -3572,12 +3624,15 @@ class VipersVideoQuicktags {
 		// Allow other plugins to modify these values (for example based on conditionals)
 		$atts = apply_filters( 'vvq_shortcodeatts', $atts, 'videofile', $origatts );
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		// This is semi-temporary. Embedding generic video files is a major pain in the ass, so this part of the plugin is kinda half-heartedly coded.
 		if ( 1 == $atts['usewmp'] && FALSE !== strpos($_SERVER['HTTP_USER_AGENT'], 'Windows') ) {
 			$atts['height'] = $atts['height'] + 64; // Compensate for the player controls
 
-			return '<span class="vvqbox vvqvideo" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><object classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=5,1,52,701" standby="Loading Microsoft Windows Media Player components..." type="application/x-oleobject" width="' . $atts['width'] . '" height="' . $atts['height'] . '"><param name="url" value="' . $content . '" /><param name="allowchangedisplaysize" value="true" /><param name="autosize" value="true" /><param name="displaysize" value="1" /><param name="showcontrols" value="true" /><param name="showstatusbar" value="true" /><param name="autorewind" value="true" /><param name="autostart" value="false" /><param name="volume" value="100" /></object></span>';
+			return '<span class="vvqbox vvqvideo" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><object classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=5,1,52,701" standby="Loading Microsoft Windows Media Player components..." type="application/x-oleobject" width="' . esc_attr( $atts['width'] ) . '" height="' . esc_attr( $atts['height'] ) . '"><param name="url" value="' . esc_url( $content ) . '" /><param name="allowchangedisplaysize" value="true" /><param name="autosize" value="true" /><param name="displaysize" value="1" /><param name="showcontrols" value="true" /><param name="showstatusbar" value="true" /><param name="autorewind" value="true" /><param name="autostart" value="false" /><param name="volume" value="100" /></object></span>';
 		} else {
 			// Determine the MIME type
 			$mimetypes = apply_filters( 'vvqvideomimes', array(
@@ -3593,7 +3648,7 @@ class VipersVideoQuicktags {
 			$mimetype = $mimetypes[array_pop(explode('.', $content))];
 			if ( empty($mimetype) ) $mimetype = 'video/mpeg'; // If we don't know the MIME type, just pick something (MPEG)
 
-			return '<span class="vvqbox vvqvideo" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><object type="' . $mimetype . '" data="' . $content . '" width="' . $atts['width'] . '" height="' . $atts['height'] . '" class="vvqbox vvqvideo"><param name="src" value="' . $content . '" /><param name="allowchangedisplaysize" value="true" /><param name="autosize" value="true" /><param name="displaysize" value="1" /><param name="showcontrols" value="true" /><param name="showstatusbar" value="true" /><param name="autorewind" value="true" /><param name="autostart" value="false" /><param name="autoplay" value="false" /><param name="volume" value="100" /></object></span>';
+			return '<span class="vvqbox vvqvideo" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><object type="' . esc_attr( $mimetype ) . '" data="' . esc_url( $content ) . '" width="' . esc_attr( $atts['width'] ) . '" height="' . esc_attr( $atts['height'] ) . '" class="vvqbox vvqvideo"><param name="src" value="' . esc_url( $content ) . '" /><param name="allowchangedisplaysize" value="true" /><param name="autosize" value="true" /><param name="displaysize" value="1" /><param name="showcontrols" value="true" /><param name="showstatusbar" value="true" /><param name="autorewind" value="true" /><param name="autostart" value="false" /><param name="autoplay" value="false" /><param name="volume" value="100" /></object></span>';
 		}
 	}
 
@@ -3632,29 +3687,40 @@ class VipersVideoQuicktags {
 				$flashvars[$key] = $value;
 		}
 
+		$atts['width']  = absint( $atts['width'] );
+		$atts['height'] = absint( $atts['height'] );
+
 
 		$objectid = $this->videoid('flash');
 
 		$this->swfobjects[$objectid] = array( 'width' => $atts['width'], 'height' => $atts['height'], 'url' => $content, 'flashvars' => $flashvars );
 
-		return '<span class="vvqbox vvqflash" style="width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;"><span id="' . $objectid . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Flash', 'vipers-video-quicktags') ) . '</em></span></span>';
+		return '<span class="vvqbox vvqflash" style="' . esc_attr( 'width:' . $atts['width'] . 'px;height:' . $atts['height'] . 'px;' ) . '"><span id="' . esc_attr( $objectid ) . '"><em>' . sprintf( __('Please <a href="%1$s">enable Javascript</a> and <a href="%2$s">Flash</a> to view this %3$s video.', 'vipers-video-quicktags'), 'http://www.google.com/support/bin/answer.py?answer=23852', 'http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash', __('Flash', 'vipers-video-quicktags') ) . '</em></span></span>';
 	}
 
 
-	// Output the SWFObject calls that replace all of the placeholders created by the shortcode handlers with the Flash videos (this is per post now)
-	function SWFObjectCalls( $content ) {
-		global $wpmu_version;
+	// This function tells WordPress to load the SWFObject JS file if SWFObjectCalls() is going to run
+	function maybe_enqueue_swfobject() {
+		if ( is_feed() || empty( $this->swfobjects ) )
+			return;
 
-		if ( is_feed() || empty($this->swfobjects) ) return $content;
+		wp_enqueue_script( 'swfobject' );
+	}
+
+
+	// Output the SWFObject calls that replace all of the placeholders created by the shortcode handlers with the Flash videos
+	function SWFObjectCalls() {
+		if ( is_feed() || empty( $this->swfobjects ) )
+			return;
 
 		// Abort if wp_head() is missing from the theme
 		//if ( FALSE == $this->wpheadrun ) return $content;
 
-		$content .= "\n<script type=\"text/javascript\">\n";
+		$content = "\n<script type=\"text/javascript\">\n";
 		//$content .= "// <![CDATA[\n";
 
 		foreach ( $this->swfobjects as $objectid => $embed ) {
-			$content .= '	swfobject.embedSWF("' . htmlspecialchars( $embed['url'] ) . '", "' . $objectid . '", "' . $embed['width'] . '", "' . $embed['height'] . '", "10", vvqexpressinstall, ';
+			$content .= '	swfobject.embedSWF("' . esc_url( $embed['url'] ) . '", "' . esc_js( $objectid ) . '", "' . esc_attr( absint( $embed['width'] ) ) . '", "' . esc_attr( absint( $embed['height'] ) ) . '", "10", vvqexpressinstall, ';
 
 			if ( empty($embed['flashvars']) || !is_array($embed['flashvars']) ) {
 				$content .= 'vvqflashvars';
@@ -3668,7 +3734,7 @@ class VipersVideoQuicktags {
 					if ( false === $value )
 						continue;
 
-					$flashvars[] = '"' . js_escape( $property ). '": "' . js_escape( $value ) . '"';
+					$flashvars[] = '"' . esc_js( $property ). '": "' . esc_js( $value ) . '"';
 				}
 
 				$content .= implode( ', ', $flashvars );
@@ -3684,12 +3750,12 @@ class VipersVideoQuicktags {
 		// Clear outputted calls
 		$this->swfobjects = array();
 
-		return $content;
+		echo $content;
 	}
 
 
-	// WordPress' js_escape() won't allow <, >, or " -- instead it converts it to an HTML entity. This is a "fixed" function that's used when needed.
-	function js_escape($text) {
+	// WordPress' esc_js() won't allow <, >, or " -- instead it converts it to an HTML entity. This is a "fixed" function that's used when needed.
+	function esc_js($text) {
 		$safe_text = addslashes($text);
 		$safe_text = preg_replace('/&#(x)?0*(?(1)27|39);?/i', "'", stripslashes($safe_text));
 		$safe_text = preg_replace("/\r?\n/", "\\n", addslashes($safe_text));
