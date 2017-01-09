@@ -2,9 +2,9 @@
 Contributors: cfinke
 Donate link: http://www.chrisfinke.com/wordpress/plugins/feed-statistics/
 Tags: rss, statistics, feeds, newsfeed, stats
-Requires at least: 3.7
-Tested up to: 4.0
-Stable tag: 4.0.1
+Requires at least: 4.3
+Tested up to: 4.5.2
+Stable tag: 4.1
 
 Compiles statistics about who is reading your blog via a feed reader and what posts they're reading.
 
@@ -12,11 +12,7 @@ Compiles statistics about who is reading your blog via a feed reader and what po
 
 Feed Statistics is a plugin that tracks statistics for your RSS/Atom feeds, including the number of subscribers, which feed readers they're using, which posts they're viewing and which links they're clicking on.
 
-You have two ways to display your subscriber count. You can either add the following code to your theme (in your sidebar, for example):
-
-`<?php feed_subscribers(); ?>`
-
-This will display a simple "123 feed subscribers" line of text that you can markup however you want. If your theme is widget-compatible, you can instead use the Feed Statistics widget, which will display the same text, but inside of an easy-to-manage widget. (If you want to style the widget text, it is inside a tag.)
+To display your subscriber count, use the Feed Statistics widget.
 
 The plugin also adds a "Feed Statistics" menu to your dashboard. This section has four subsections: Feed Statistics (Options), Feed Readers, Post Views, and Clickthroughs.
 
@@ -30,6 +26,10 @@ It will take a few days for the subscriber count to become accurate, so you may 
 4. If you have clickthrough tracking turned on (it's disabled by default), this page will show the links in your posts that your feed subscribers are clicking on.
 
 == Changelog ==
+
+= 4.1 =
+* Fixed compatibility with PHP 7.
+* Added Serbian translation.
 
 = 4.0 =
 * Fixed bug allowing Feed Statistics to be used as an open redirect

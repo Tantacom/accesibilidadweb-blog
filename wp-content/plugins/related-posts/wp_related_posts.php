@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Related Posts
-Version: 3.6
+Version: 3.6.1
 Plugin URI: http://wordpress.org/extend/plugins/related-posts/
 Description: Link to related content to help your readers. Get attention from other authors. Make great outbound links for SEO. With just a few clicks.
-Author: Zemanta
-Author URI: http://www.zemanta.com
+Author: Sovrn, zemanta
+Author URI: http://www.sovrn.com
 */
 
 if (! function_exists('wp_rp_init_zemanta')) {
@@ -34,4 +34,3 @@ else {
 	}
 	add_action( 'admin_notices', 'gp_multiple_plugins_notice' );
 }
-

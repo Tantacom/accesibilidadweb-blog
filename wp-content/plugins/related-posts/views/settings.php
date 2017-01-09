@@ -8,14 +8,14 @@
 		<div class="support">
 			<h4><?php _e("Awesome support", 'wp_related_posts'); ?></h4>
 			<p>
-				<?php _e("If you have any questions please contact us at",'wp_related_posts');?> <a target="_blank" href="mailto:support+gp@zemanta.com"><?php _e("support", 'wp_related_posts');?></a>.
+				<?php _e("If you have any questions please contact us at",'wp_related_posts');?> <a target="_blank" href="mailto:ea-support@sovrn.com"><?php _e("support", 'wp_related_posts');?></a>.
 			</p>
 		</div>
 		<h2 class="title">
 			<?php _e("Related Posts",'wp_related_posts');?> 
 			<span>
 				<?php _e("by",'wp_related_posts');?> 
-				<a href="http://www.zemanta.com">Zemanta</a>
+				<a target="_blank" href="http://www.sovrn.com">Sovrn</a>
 			</span>
 		</h2>
 	</div>
@@ -54,13 +54,13 @@
 		<form method="get" action="">
 			<fieldset>
 				<input type="hidden" name="page" value="wordpress-related-posts" />
-				<input class="button-primary" type="submit" name="wp_rp_upload_articles" value="<?php _e("Upload my articles to Zemanta",'wp_related_posts');?>">
+				<input class="button-primary" type="submit" name="wp_rp_upload_articles" value="<?php _e("Upload my articles to Sovrn",'wp_related_posts');?>">
 			</fieldset>
 		</form>
 		<?php else: ?>
 		<p>Your articles are being uploaded.</p>
 		<?php endif; ?>
-		<h3>Number of articles in Zemanta network: <?php echo $articles_count; ?></h3>
+		<h3>Number of articles in Sovrn network: <?php echo $articles_count; ?></h3>
 	</div>
 	<!-- MAIN FORM -->
 	<form method="post" enctype="multipart/form-data" action="<?php echo $form_url; ?>" id="wp_rp_settings_form" style="display: <?php echo $form_display; ?>;">
@@ -215,7 +215,7 @@
 							</div>
 							<label>
 								<input name="wp_rp_classic_state" type="checkbox" id="wp_rp_classic_state" value="yes" <?php checked($meta['classic_user']); ?>>
-								<?php _e("Display widget with <a href=\"http://support.zemanta.com/customer/portal/articles/1423148-why-should-i-add-related-articles-from-around-the-web-\" target=\"blank\">articles from around the web</a> in your \"Compose-new-post\" page",'wp_related_posts');?>
+								<?php _e("Display widget with articles from around the web</a> in your \"Compose-new-post\" page",'wp_related_posts');?>
 							</label><?php endif; ?>
 							<br/>
 							<label>
@@ -249,24 +249,16 @@
 				<h3>Did you know?</h3>
 				<p>This plugin supports two types of related posts - automatic and those you can add manually.</p>
 				
-				<p>Automatic posts work out of the box. They're already turned on and they link to your own posts only. And that's just the <a href="http://zem.si/1kGo9V6" target="_blank">first step</a> towards being a better blogger.</p>
+				<p>Automatic posts work out of the box. They're already turned on and they link to your own posts only.
 				
-				<p>But you <a href="http://zem.si/1eolNqf" target="_blank">can do more</a>. You can attract attention from other bloggers and improve your credibility by inserting recommendations that show up below your editor, while you write. This way everybody wins.</p>
+				<p>You can attract attention from other bloggers and improve your credibility by inserting recommendations that show up below your editor, while you write. This way everybody wins.</p>
 
 				<p>Also - you can now use our related articles widget while composing your posts in the <strong>Text mode</strong> of your editor. This way your workflow won't be interrupted by switching back and forth between <em>Visual</em> and <em>Text</em> mode.</p> 
 				<iframe src="//player.vimeo.com/video/97413693" width="500" height="375" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
 				
 				<h3>FAQ</h3>
 				<p><strong>Are manually added related posts available only for bloggers who write in English?</strong> <br />Yes.</p>
-				<p><strong>Will my posts be recommended to others?</strong> <br />Depends, check our <a href="http://zem.si/PLAzS1" target="_blank">guidelines</a> if you fit in.
-				</p>
-				<p><strong>What are activity reports?</strong><br>We know when Zemanta users link to each other and we know when they link to you! We'll let you know when this happens, if you subscribe.</p>
-				<h3>Tips and guidelines from our blog</h3>
-				<ul>
-					<li><a href="http://zem.si/1kGo9V6" target="_blank">I've inserted Related Posts plugin, now what?</a></li>
-					<li><a href="http://zem.si/1eolNqf" target="_blank">Ready to publish?</a></li>
-					<li><a href="http://zem.si/PLAzS1" target="_blank">Zemanta how-to-blog-better guidelines</a></li>
-				</ul> 
+				<p><strong>What are activity reports?</strong><br>We know when Sovrn users link to each other and we know when they link to you! We'll let you know when this happens, if you subscribe.</p>
 			</div>
 		</div>
 		<p class="submit end-block">
@@ -274,7 +266,3 @@
 		</p>
 	</form>
 </div>
-
-
-
-

@@ -4,7 +4,7 @@
 Plugin Name: Feed Statistics
 Plugin URI: http://www.chrisfinke.com/wordpress/plugins/feed-statistics/
 Description: Compiles statistics about who is reading your blog via a feed reader and what posts they're reading.
-Version: 4.0.1
+Version: 4.1
 Author: Christopher Finke
 Author URI: http://www.chrisfinke.com/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages/
 Text Domain: feed-statistics
 */
 
-define( 'FEED_STATISTICS_VERSION', '4.0' );
+define( 'FEED_STATISTICS_VERSION', '4.1' );
 
 class FEED_STATS {
 	const LINK_REGEX = "(<a[^>]+href=)(['\"])([^\#][^'\"]+)(['\"])([^>]*>)";
@@ -909,20 +909,23 @@ class FEED_STATS {
 			
 			$redirect_url = home_url( '/?feed-stats-url=' );
 		
-			$content = preg_replace( "/" . self::LINK_REGEX . "/ie", "'$1\"' . FEED_STATS::generate_clickthrough_url( '\\3' ) . '\"$5'", $content);
+			$content = preg_replace_callback( "/" . self::LINK_REGEX . "/i", array( 'FEED_STATS', 'generate_clickthrough_url' ), $content);
 		}	
 		
 		return $content;
 	}
 	
-	static function generate_clickthrough_url( $url ) {
-		if ( strpos( $url, "//" ) === false ) {
-			return $url;
+	static function generate_clickthrough_url( $matches ) {
+		$url = $matches[3];
+		
+		$clickthrough_url = $url;
+
+		if ( strpos( $url, "//" ) !== false ) {
+			$post_id = get_the_ID();
+			$clickthrough_url = esc_url( home_url( '/?feed-stats-url=' . urlencode( base64_encode( $url ) ) ) . '&feed-stats-url-post-id=' . urlencode( $post_id ) );
 		}
-		
-		$post_id = get_the_ID();
-		
-		return esc_url( home_url( '/?feed-stats-url=' . urlencode( base64_encode( $url ) ) ) . '&feed-stats-url-post-id=' . urlencode( $post_id ) );
+
+		return $matches[1] . '"' . $clickthrough_url . '"' . $matches[5];
 	}
 	
 	static function postview_tracker($content) {

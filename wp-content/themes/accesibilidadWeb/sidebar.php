@@ -17,7 +17,7 @@
 
 			<li><h2>Lo más leído</h2>
 			<ul>
-				<?php get_most_viewed('post', 10); ?>
+				<?php get_most_viewed(10); ?>
 				</ul>
 			</li>
 
