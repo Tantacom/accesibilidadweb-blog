@@ -1,10 +1,10 @@
-﻿=== Plugin Name ===
-Contributors: zemanta
-Tags: link, links, navigation, plugin, related, Post, posts, widget, widgets
+﻿=== Related Posts ===
+Contributors: sovrn, zemanta
+Tags: link, links, navigation, plugin, related, Post, posts, widget, widgets, sovrn
 License: GPLv2
 Requires at least: 3.6
-Tested up to: 4.3
-Stable tag: 3.6
+Tested up to: 4.6
+Stable tag: 3.6.1
 
 Link to related content to help your readers. Get attention from other authors. Make great outbound links for SEO. With just a few clicks.
 
@@ -16,9 +16,6 @@ Link to related content to help your readers. Get attention from other authors. 
 * Related posts help your readers discover your own related content by automatically linking to it at the bottom of each post.
 * Related articles help your readers find other related content from bloggers just like you. You can get the attention from the authors you’ve linked to.
 * In-text links are similar to related articles, but they also include links to Wikipedia, Google Maps, IMDb and others.
-
-
-[Click here to read more about related posts.](http://zem.si/1lURE9G)
 
 
 This plugin is basically a testbed for features. When features get stable they get into the main plug-in which is [WordPress Related Posts](http://wordpress.org/plugins/wordpress-23-related-posts-plugin/).
@@ -48,7 +45,7 @@ If your content is all English, safe for work and of good quality, we will recom
 That is how we keep this plugin free. Publishers pay us to show you related content from their sites. You don’t have to use it. However, we believe that promoted content widens the range of good quality content you can link to.
 
 = What about Terms of Service and Privacy policy? =
-Before using the plugin please read the full version of [Zemanta Terms of Service](http://www.zemanta.com/legal/terms-of-service/) and [Zemanta Privacy Policy](http://www.zemanta.com/legal/privacy/).
+Before using the plugin please read the full version of [Sovrn Terms of Service](http://www.sovrn.com/editorial-network-terms-of-service/) and [Sovrn Privacy Policy](http://www.sovrn.com/privacy-policy/).
 
 == Installation ==
 
@@ -76,10 +73,13 @@ Fix for security vulnerability. Upgrade immediately.
 
 == Terms of Service ==
 
-The plugin source code is released under GPLv2. Usage of our service is governed by [Zemanta Terms of Service](http://www.zemanta.com/legal/terms-of-service/) and [Zemanta Privacy Policy](http://www.zemanta.com/legal/privacy/).	
+The plugin source code is released under GPLv2. Usage of our service is governed by [Sovrn Terms of Service](http://www.sovrn.com/editorial-network-terms-of-service/) and [Sovrn Privacy Policy](http://www.sovrn.com/privacy-policy/).	
 
 
 == Changelog ==
+
+= 3.6.1 =
+* Rebrand
 
 = 3.6 =
 * Support for category names in related posts

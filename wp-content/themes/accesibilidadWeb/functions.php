@@ -82,6 +82,51 @@ function kubrick_header_display_string() {
 
 add_action('admin_menu', 'kubrick_add_theme_page');
 
+function get_most_viewed ($num){
+	$html = '';
+	global $wpdb;
+	$results = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT 
+						COUNT(*) AS `views`,
+						`v`.`post_id`,
+						`p`.`post_title` `title`,
+						`p`.`guid` `permalink`
+					FROM " . $wpdb->prefix . "feed_postviews AS `v`
+					LEFT JOIN " . $wpdb->prefix . "posts AS `p` ON `v`.`post_id`=`p`.`ID`
+					WHERE `v`.`time` > %s
+					GROUP BY `v`.`post_id`
+					ORDER BY `views` DESC
+					LIMIT ".$num,
+					date("Y-m-d H:i:s", time() - (60 * 60 * 24 * 30))
+				)
+	);
+	$feeds = array();
+
+	$i = 1;
+
+	if ( ! empty( $results ) ) {
+		$html = '<ul>';
+
+		foreach ( $results as $feed ) {
+			$html .= '<li><a href="'.get_permalink ($feed->id).'">'.$feed->title.'</a></li>';
+		}
+		$html .= '</ul>';
+	}
+	echo $html;
+}
+
+function page_description (){
+	if ( is_category()  ){
+		global $post;
+		$categories = get_the_category($post->ID);
+		echo 'Publicamos artículos en profundidad sobre '.$categories[0]->cat_name.'...Consúltalos';
+	}
+	else{
+		echo 'Publicamos artículos en profundidad sobre temas de actualidad relacionados con la accesibilidad web, el desarrollo frontend y el desarrollo backend y cms, tendencias... Consúltalos.';
+	}
+}
+
 function kubrick_add_theme_page() {
 	if ( $_GET['page'] == basename(__FILE__) ) {
 		if ( 'save' == $_REQUEST['action'] ) {

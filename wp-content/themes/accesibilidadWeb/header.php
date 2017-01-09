@@ -9,18 +9,7 @@
 <meta name="generator" content="WordPress <?php bloginfo('version'); ?>" /> <!-- leave this for stats -->
 <meta name="verify-v1" content="wGtOnqRKiqCMMzolI4LvmEeGpXbQLAwezPp8nfOvCdM=" />
 
-<?	
-	if ( is_category()  ){		
-		global $post;
-		$categories = get_the_category($post->ID);
-	 	$des =  "Publicamos artículos en profundidad sobre ".$categories[0]->cat_name."...Consúltalos" ?>
-	 	<meta name="description" content="<? echo $des; ?>" />
-	<? 	
-	}else if(is_date()){ ?>
-		
-	 	<meta name="description" content="Publicamos artículos en profundidad sobre temas de actualidad relacionados con la accesibilidad web, el desarrollo frontend y el desarrollo backend y cms, tendencias... Consúltalos." />
-	
-	<? } ?>
+<meta name="description" content="<?php page_description (); ?>" />
 
 <!-- Metadatos de navegacion semantica -->
 <link rel="start" href="/index.php" title="Página inicial" />

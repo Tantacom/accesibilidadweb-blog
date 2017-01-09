@@ -134,6 +134,9 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 		echo "\n" . '</div>'; // .widget-gallery-$type
 
 		echo "\n" . $after_widget;
+
+		/** This action is documented in modules/widgets/gravatar-profile.php */
+		do_action( 'jetpack_stats_extra', 'widget_view', 'gallery' );
 	}
 
 	/**
@@ -253,7 +256,7 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 
 		foreach ( $instance['attachments'] as $attachment ) {
 			$attachment_image_src = wp_get_attachment_image_src( $attachment->ID, 'full' );
-			$attachment_image_src = $attachment_image_src[0]; // [url, width, height]
+			$attachment_image_src = jetpack_photon_url( $attachment_image_src[0], array( 'w' => $this->_instance_width ) ); // [url, width, height]
 
 			$caption 	= wptexturize( strip_tags( $attachment->post_excerpt ) );
 

@@ -50,10 +50,6 @@
 
 					</small>
 				</p>
-				<h2>Entradas relacionadas</h2>
-				<ul>
-				<?php related_posts($limit, $len, '$before_title', '$after_title', '$before_post', '$after_post', $show_pass_post, $show_excerpt); ?>
-				</ul>
 
 			</div>
 		</div>
