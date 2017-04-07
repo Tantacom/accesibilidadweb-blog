@@ -22,7 +22,7 @@
 <link rel="section" href="blog/index.php" title="Blog" />
 <link rel="section" href="/tanta_comunicacion.php" title="Contacto" />
 
-<link href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/css/styles.css" rel="stylesheet" type="text/css" />
+<link href="//<?php echo $_SERVER['SERVER_NAME']; ?>/css/styles.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
   <!--[if lte IE 6]>
 	<link rel="stylesheet" type="text/css" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/css/fixIE6.css" />
@@ -31,7 +31,7 @@
 	<link rel="stylesheet" type="text/css" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/css/fixIE7.css" />
 <![endif]-->
 
-<link rel="stylesheet" type="text/css" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/css/impresion.css" media="print" />
+<link rel="stylesheet" type="text/css" href="//<?php echo $_SERVER['SERVER_NAME']; ?>/css/impresion.css" media="print" />
 
 <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
 
@@ -57,7 +57,7 @@
 					<li class="reset"><a href="/tanta_comunicacion.php" accesskey="7">Contacto</a></li>
 				</ul>
 			</div>
-			<a href="/index.php"><img src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/img/accesibilidadweb.gif" width="243" height="18" alt="Ir a inicio." id="logo" /></a>
+			<a href="/index.php"><img src="//<?php echo $_SERVER['SERVER_NAME']; ?>/img/accesibilidadweb.gif" width="243" height="18" alt="Ir a inicio." id="logo" /></a>
 		</div>
 
 		<div id="navBar">
